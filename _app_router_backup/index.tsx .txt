@@ -1,0 +1,72 @@
+import { View, Text, StyleSheet, Pressable } from 'react-native';
+import { useRouter } from 'expo-router';
+
+export default function Home() {
+  const router = useRouter();
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>Gauteng Department of Education</Text>
+      <Text style={styles.subtitle}>Subject Advisor Reporting Tools</Text>
+
+      <Pressable
+        style={styles.card}
+        onPress={() => router.push('/(reports)/school-visit')}
+      >
+        <Text style={styles.cardTitle}>School Visit Report</Text>
+        <Text style={styles.cardText}>
+          Routine monitoring and support visits
+        </Text>
+      </Pressable>
+
+      <Pressable
+        style={[styles.card, styles.priority]}
+        onPress={() => router.push('/(reports)/priority-visit')}
+      >
+        <Text style={styles.cardTitle}>Priority School Visit</Text>
+        <Text style={styles.cardText}>
+          Intervention and priority school support
+        </Text>
+      </Pressable>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 24,
+    justifyContent: 'center',
+    backgroundColor: '#f5f6fa',
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 4,
+  },
+  subtitle: {
+    textAlign: 'center',
+    marginBottom: 30,
+    color: '#555',
+  },
+  card: {
+    backgroundColor: '#0B5ED7',
+    padding: 20,
+    borderRadius: 10,
+    marginBottom: 20,
+  },
+  priority: {
+    backgroundColor: '#842029',
+  },
+  cardTitle: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
+    marginBottom: 5,
+  },
+  cardText: {
+    color: '#eaeaea',
+    fontSize: 13,
+  },
+});

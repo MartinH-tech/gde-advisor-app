@@ -30,9 +30,7 @@
     },
     "web": {
       "bundler": "metro",
-      "output": "static",
-      "favicon": "./assets/gde-icon-192x192.png",
-      "backgroundColor": "#0b3d6d"
+      "favicon": "./assets/gde-icon-512x512.png"
     },
     "extra": {
       "eas": {

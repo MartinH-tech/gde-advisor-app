@@ -1729,6 +1729,15 @@ ${schoolChallenges}
 const Stack = createNativeStackNavigator();
 
 export default function App() {
+
+  React.useEffect(() => {
+    if (Platform.OS === 'web' && 'serviceWorker' in navigator) {
+      navigator.serviceWorker
+        .register('/sw.js')
+        .catch((err) => console.log('Service Worker registration failed:', err));
+    }
+  }, []);
+
   return (
     <NavigationContainer>
       <Stack.Navigator>

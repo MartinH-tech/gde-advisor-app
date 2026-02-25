@@ -33,3 +33,53 @@
     }
   }
 }
+
+{
+  "expo": {
+    "name": "GDE Advisor App",
+    "slug": "gde-advisor-app",
+    "version": "2.1.0",
+    "orientation": "portrait",
+    "platforms": ["ios", "android", "web"],
+    "icon": "./assets/gde-icon-512x512.png",
+    "scheme": "gdeadvisor",
+    "userInterfaceStyle": "automatic",
+
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "cover",
+      "backgroundColor": "#ffffff"
+    },
+
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+
+    "ios": {
+      "supportsTablet": true
+    },
+
+    "android": {
+      "icon": "./assets/gde-icon-512x512.png",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/gde-icon-512x512.png",
+        "backgroundColor": "#0b3d6d"
+      },
+      "package": "gdesubjectadvisor.app",
+      "versionCode": 2
+    },
+
+    "web": {
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./assets/gde-icon-192x192.png",
+      "backgroundColor": "#0b3d6d"
+    },
+
+    "extra": {
+      "eas": {
+        "projectId": "6555952c-72cd-4db2-a779-85bf5f08a7e7"
+      }
+    }
+  }
+}

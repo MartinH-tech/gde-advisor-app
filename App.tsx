@@ -523,15 +523,16 @@ function SchoolVisitScreen() {
     let refined = text.trim();
 
     // Normalize spacing
-    refined = refined.replace(/\s+/g, ' ');
-    refined = refined.replace(/\.\s*/g, '. ');
-    refined = refined.replace(/\?\s*/g, '? ');
-    refined = refined.replace(/\!\s*/g, '! ');
+    refined = refined.replace(/\s+/g, ' ').trim();
 
-    // Capitalise first letter of sentences
-    refined = refined.replace(/(^\w|[.!?]\s+\w)/g, (c) =>
-      c.toUpperCase()
-    );
+    // Convert manual dashes/asterisks into bullets
+    refined = refined.replace(/^\s*[-*]\s+/gm, '• ');
+
+    // Ensure spacing after punctuation
+    refined = refined.replace(/([.!?])([A-Za-z])/g, '$1 $2');
+
+    // Capitalise sentences
+    refined = refined.replace(/(^\w|[.!?]\s+\w)/g, (c) => c.toUpperCase());
 
     // Vocabulary upgrades
     const replacements: Record<string, string> = {
@@ -542,7 +543,6 @@ function SchoolVisitScreen() {
       things: 'matters',
       'big problem': 'significant concern',
       'not good': 'unsatisfactory',
-      'very bad': 'highly concerning',
       bad: 'inadequate',
       good: 'effective',
       okay: 'satisfactory',
@@ -557,38 +557,49 @@ function SchoolVisitScreen() {
       refined = refined.replace(regex, replacements[word]);
     });
 
-    // Convert multiple sentences into bullet points if more than 2 sentences
-    const sentences = refined.split('. ').filter(Boolean);
+    const sentences = refined.split(/(?<=[.!?])\s+/).filter(Boolean);
 
-    if (sentences.length > 2) {
-      refined = sentences
-        .map((s) => '• ' + s.trim().replace(/\.$/, ''))
-        .join('\n');
+    // -------- INTELLIGENT SECTION AWARE FORMATTING --------
+
+    if (section === 'findings') {
+      if (sentences.length >= 3) {
+        refined = sentences
+          .map((s) => '• ' + s.trim().replace(/[.!?]$/, ''))
+          .join('\n');
+      } else {
+        refined =
+          'It was observed that ' +
+          refined.charAt(0).toLowerCase() +
+          refined.slice(1);
+      }
     }
 
-    // Split very long paragraphs into structured blocks
-    if (refined.length > 350) {
-      const parts = refined.match(/.{1,250}(?:\s|$)/g);
+    if (section === 'challenges') {
+      refined =
+        sentences.length >= 2
+          ? sentences.map((s) => '• ' + s.trim().replace(/[.!?]$/, '')).join('\n')
+          : 'The following challenge was identified: ' +
+            refined.charAt(0).toLowerCase() +
+            refined.slice(1);
+    }
+
+    if (section === 'recommendations') {
+      refined =
+        sentences.length >= 2
+          ? sentences.map((s) => '• ' + s.trim().replace(/[.!?]$/, '')).join('\n')
+          : 'It is recommended that ' +
+            refined.charAt(0).toLowerCase() +
+            refined.slice(1);
+    }
+
+    // Split very long blocks
+    if (refined.length > 800) {
+      const parts = refined.match(/.{1,400}(?:\s|$)/g);
       if (parts) refined = parts.join('\n\n');
     }
 
-    // Section-specific transitions
-    const lower = refined.toLowerCase();
-
-    if (section === 'findings' && !lower.startsWith('•') && !lower.startsWith('it was observed')) {
-      refined = 'It was observed that ' + refined.charAt(0).toLowerCase() + refined.slice(1);
-    }
-
-    if (section === 'challenges' && !lower.startsWith('•') && !lower.startsWith('the following challenges')) {
-      refined = 'The following challenges were identified: ' + refined.charAt(0).toLowerCase() + refined.slice(1);
-    }
-
-    if (section === 'recommendations' && !lower.startsWith('•') && !lower.startsWith('it is recommended')) {
-      refined = 'It is recommended that ' + refined.charAt(0).toLowerCase() + refined.slice(1);
-    }
-
     if (!/[.!?\n]$/.test(refined)) {
-      refined = refined + '.';
+      refined += '.';
     }
 
     return refined;
@@ -1245,15 +1256,16 @@ function PriorityVisitScreen() {
     let refined = text.trim();
 
     // Normalize spacing
-    refined = refined.replace(/\s+/g, ' ');
-    refined = refined.replace(/\.\s*/g, '. ');
-    refined = refined.replace(/\?\s*/g, '? ');
-    refined = refined.replace(/\!\s*/g, '! ');
+    refined = refined.replace(/\s+/g, ' ').trim();
 
-    // Capitalise first letter of sentences
-    refined = refined.replace(/(^\w|[.!?]\s+\w)/g, (c) =>
-      c.toUpperCase()
-    );
+    // Convert manual dashes/asterisks into bullets
+    refined = refined.replace(/^\s*[-*]\s+/gm, '• ');
+
+    // Ensure spacing after punctuation
+    refined = refined.replace(/([.!?])([A-Za-z])/g, '$1 $2');
+
+    // Capitalise sentences
+    refined = refined.replace(/(^\w|[.!?]\s+\w)/g, (c) => c.toUpperCase());
 
     // Vocabulary upgrades
     const replacements: Record<string, string> = {
@@ -1264,7 +1276,6 @@ function PriorityVisitScreen() {
       things: 'matters',
       'big problem': 'significant concern',
       'not good': 'unsatisfactory',
-      'very bad': 'highly concerning',
       bad: 'inadequate',
       good: 'effective',
       okay: 'satisfactory',
@@ -1279,38 +1290,49 @@ function PriorityVisitScreen() {
       refined = refined.replace(regex, replacements[word]);
     });
 
-    // Convert multiple sentences into bullet points if more than 2 sentences
-    const sentences = refined.split('. ').filter(Boolean);
+    const sentences = refined.split(/(?<=[.!?])\s+/).filter(Boolean);
 
-    if (sentences.length > 2) {
-      refined = sentences
-        .map((s) => '• ' + s.trim().replace(/\.$/, ''))
-        .join('\n');
+    // -------- INTELLIGENT SECTION AWARE FORMATTING --------
+
+    if (section === 'findings') {
+      if (sentences.length >= 3) {
+        refined = sentences
+          .map((s) => '• ' + s.trim().replace(/[.!?]$/, ''))
+          .join('\n');
+      } else {
+        refined =
+          'It was observed that ' +
+          refined.charAt(0).toLowerCase() +
+          refined.slice(1);
+      }
     }
 
-    // Split very long paragraphs into structured blocks
-    if (refined.length > 350) {
-      const parts = refined.match(/.{1,250}(?:\s|$)/g);
+    if (section === 'challenges') {
+      refined =
+        sentences.length >= 2
+          ? sentences.map((s) => '• ' + s.trim().replace(/[.!?]$/, '')).join('\n')
+          : 'The following challenge was identified: ' +
+            refined.charAt(0).toLowerCase() +
+            refined.slice(1);
+    }
+
+    if (section === 'recommendations') {
+      refined =
+        sentences.length >= 2
+          ? sentences.map((s) => '• ' + s.trim().replace(/[.!?]$/, '')).join('\n')
+          : 'It is recommended that ' +
+            refined.charAt(0).toLowerCase() +
+            refined.slice(1);
+    }
+
+    // Split very long blocks
+    if (refined.length > 800) {
+      const parts = refined.match(/.{1,400}(?:\s|$)/g);
       if (parts) refined = parts.join('\n\n');
     }
 
-    // Section-specific transitions
-    const lower = refined.toLowerCase();
-
-    if (section === 'findings' && !lower.startsWith('•') && !lower.startsWith('it was observed')) {
-      refined = 'It was observed that ' + refined.charAt(0).toLowerCase() + refined.slice(1);
-    }
-
-    if (section === 'challenges' && !lower.startsWith('•') && !lower.startsWith('the following challenges')) {
-      refined = 'The following challenges were identified: ' + refined.charAt(0).toLowerCase() + refined.slice(1);
-    }
-
-    if (section === 'recommendations' && !lower.startsWith('•') && !lower.startsWith('it is recommended')) {
-      refined = 'It is recommended that ' + refined.charAt(0).toLowerCase() + refined.slice(1);
-    }
-
     if (!/[.!?\n]$/.test(refined)) {
-      refined = refined + '.';
+      refined += '.';
     }
 
     return refined;

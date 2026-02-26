@@ -234,21 +234,16 @@ const SUBJECT_LIST = [
 
 function HomeScreen({ navigation }: any) {
   return (
-    <ScrollView contentContainerStyle={styles.homeContainer}>
-      <View style={styles.headerBar} />
+    <View style={{ flex: 1, backgroundColor: '#0b3d6d' }}>
+      <ScrollView contentContainerStyle={[styles.homeContainer, { flexGrow: 1, minHeight: '100%' }]}
+        style={{ flex: 1 }}>
+        <View style={styles.headerBar} />
 
-      <Text style={styles.title}>Gauteng Department of Education</Text>
-      <Text style={styles.subtitle}>Subject Advisor Reporting Tools</Text>
+        <Text style={styles.title}>Gauteng Department of Education</Text>
+        <Text style={styles.bigSubtitle}>Subject Advisor Reporting Tools</Text>
+        <View style={styles.thickYellowLine} />
 
-      <Pressable
-        style={styles.card}
-        onPress={() => navigation.navigate('SchoolVisit')}
-      >
-        <Text style={styles.cardTitle}>School Visit Report</Text>
-        <Text style={styles.cardText}>
-          Routine monitoring, support and follow-up visits
-        </Text>
-      </Pressable>
+        {/* ...existing code... */}
 
       <Pressable
         style={[styles.card, styles.priority]}
@@ -730,44 +725,56 @@ function GroupSupportScreen() {
       <TextInput style={styles.input} value={staffMember} onChangeText={setStaffMember} />
 
       <Text style={styles.section}>Date</Text>
-      <Pressable style={styles.input} onPress={() => setShowDatePicker(true)}>
-        <Text>{date ? date : 'Select date'}</Text>
-      </Pressable>
-      {showDatePicker && (
-        Platform.OS === 'android' ? (
-          <DateTimePicker
-            value={date ? new Date(date) : new Date()}
-            mode="date"
-            display="default"
-            onChange={(event: DateTimePickerEvent, selectedDate?: Date) => {
-              setShowDatePicker(false);
-              if (selectedDate) {
-                setDate(selectedDate.toISOString().split('T')[0]);
-              }
-            }}
-          />
-        ) : (
-          <Modal transparent={true} visible={showDatePicker} animationType="slide">
-            <View style={{ flex: 1, justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.3)' }}>
-              <View style={{ backgroundColor: 'white', margin: 24, borderRadius: 8, padding: 16 }}>
-                <DateTimePicker
-                  value={date ? new Date(date) : new Date()}
-                  mode="date"
-                  display="spinner"
-                  onChange={(event: DateTimePickerEvent, selectedDate?: Date) => {
-                    if (event.type === 'set' && selectedDate) {
-                      setDate(selectedDate.toISOString().split('T')[0]);
-                    }
-                    setShowDatePicker(false);
-                  }}
-                />
-                <Pressable onPress={() => setShowDatePicker(false)} style={{ marginTop: 8, alignItems: 'center' }}>
-                  <Text style={{ color: '#007AFF', fontWeight: 'bold' }}>Done</Text>
-                </Pressable>
-              </View>
-            </View>
-          </Modal>
-        )
+      {Platform.OS === 'web' ? (
+        <input
+          type="date"
+          className="web-date-input"
+          style={{ ...styles.input, color: '#0b3d6d', background: '#ffcc00', border: 'none', fontSize: 16, padding: 10, borderRadius: 10, marginTop: 8 }}
+          value={date}
+          onChange={e => setDate(e.target.value)}
+        />
+      ) : (
+        <>
+          <Pressable style={styles.input} onPress={() => setShowDatePicker(true)}>
+            <Text>{date ? date : 'Select date'}</Text>
+          </Pressable>
+          {showDatePicker && (
+            Platform.OS === 'android' ? (
+              <DateTimePicker
+                value={date ? new Date(date) : new Date()}
+                mode="date"
+                display="default"
+                onChange={(event: DateTimePickerEvent, selectedDate?: Date) => {
+                  setShowDatePicker(false);
+                  if (selectedDate) {
+                    setDate(selectedDate.toISOString().split('T')[0]);
+                  }
+                }}
+              />
+            ) : (
+              <Modal transparent={true} visible={showDatePicker} animationType="slide">
+                <View style={{ flex: 1, justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.3)' }}>
+                  <View style={{ backgroundColor: 'white', margin: 24, borderRadius: 8, padding: 16 }}>
+                    <DateTimePicker
+                      value={date ? new Date(date) : new Date()}
+                      mode="date"
+                      display="spinner"
+                      onChange={(event: DateTimePickerEvent, selectedDate?: Date) => {
+                        if (event.type === 'set' && selectedDate) {
+                          setDate(selectedDate.toISOString().split('T')[0]);
+                        }
+                        setShowDatePicker(false);
+                      }}
+                    />
+                    <Pressable onPress={() => setShowDatePicker(false)} style={{ marginTop: 8, alignItems: 'center' }}>
+                      <Text style={{ color: '#007AFF', fontWeight: 'bold' }}>Done</Text>
+                    </Pressable>
+                  </View>
+                </View>
+              </Modal>
+            )
+          )}
+        </>
       )}
 
       <Text style={styles.section}>Subject Supported</Text>
@@ -2761,6 +2768,26 @@ export default function App() {
 /* ---------------- STYLES ---------------- */
 
 const styles = StyleSheet.create({
+    bigSubtitle: {
+      textAlign: 'center',
+      marginBottom: 18,
+      color: '#ffcc00',
+      fontSize: 28,
+      fontWeight: 'bold',
+      letterSpacing: 1.2,
+      marginTop: 8,
+      textShadowColor: '#000',
+      textShadowOffset: { width: 0, height: 2 },
+      textShadowRadius: 6,
+    },
+    thickYellowLine: {
+      height: 8,
+      backgroundColor: '#ffcc00',
+      borderRadius: 4,
+      marginBottom: 24,
+      width: '80%',
+      alignSelf: 'center',
+    },
   /* ---------- GLOBAL CONTAINERS ---------- */
 
   homeContainer: {

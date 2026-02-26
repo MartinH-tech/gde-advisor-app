@@ -236,7 +236,7 @@ const SUBJECT_LIST = [
 
 function HomeScreen({ navigation }: any) {
   return (
-    <View style={styles.homeContainer}>
+    <ScrollView contentContainerStyle={styles.homeContainer}>
       <View style={styles.headerBar} />
 
       <Text style={styles.title}>Gauteng Department of Education</Text>
@@ -301,7 +301,7 @@ function HomeScreen({ navigation }: any) {
           NSC Examination Centre Readiness & Commitment Monitoring
         </Text>
       </Pressable>
-    </View>
+    </ScrollView>
   );
 }
 function ExaminationMonitoringScreen() {
@@ -310,7 +310,6 @@ function ExaminationMonitoringScreen() {
   const [showSchoolList, setShowSchoolList] = React.useState(false);
 
   const [date, setDate] = React.useState('');
-  const [showDatePicker, setShowDatePicker] = React.useState(false);
 
   const [monitorName, setMonitorName] = React.useState('');
   const [candidatesRegistered, setCandidatesRegistered] = React.useState('');
@@ -517,23 +516,12 @@ function ExaminationMonitoringScreen() {
       )}
 
       <Text style={styles.section}>Date</Text>
-      <Pressable style={styles.input} onPress={() => setShowDatePicker(true)}>
-        <Text>{date || 'Select date'}</Text>
-      </Pressable>
-
-      {showDatePicker && (
-        <DateTimePicker
-          value={date ? new Date(date) : new Date()}
-          mode="date"
-          display="default"
-          onChange={(event, selectedDate) => {
-            setShowDatePicker(false);
-            if (selectedDate) {
-              setDate(selectedDate.toISOString().split('T')[0]);
-            }
-          }}
-        />
-      )}
+      <TextInput
+        style={styles.input}
+        placeholder="YYYY-MM-DD"
+        value={date}
+        onChangeText={setDate}
+      />
 
       <Text style={styles.section}>Monitor Name</Text>
       <TextInput style={styles.input} value={monitorName} onChangeText={setMonitorName} />
@@ -626,7 +614,6 @@ function ExaminationMonitoringScreen() {
 function GroupSupportScreen() {
   const [staffMember, setStaffMember] = React.useState('');
   const [date, setDate] = React.useState('');
-  const [showDatePicker, setShowDatePicker] = React.useState(false);
   const [subject, setSubject] = React.useState('');
   const [subjectSearch, setSubjectSearch] = React.useState('');
   const [showSubjectList, setShowSubjectList] = React.useState(false);
@@ -820,27 +807,12 @@ function GroupSupportScreen() {
       <TextInput style={styles.input} value={staffMember} onChangeText={setStaffMember} />
 
       <Text style={styles.section}>Date</Text>
-      <Pressable
+      <TextInput
         style={styles.input}
-        onPress={() => setShowDatePicker(true)}
-      >
-        <Text>{date || 'Select date'}</Text>
-      </Pressable>
-
-      {showDatePicker && (
-        <DateTimePicker
-          value={date ? new Date(date) : new Date()}
-          mode="date"
-          display="default"
-          onChange={(event, selectedDate) => {
-            setShowDatePicker(false);
-            if (selectedDate) {
-              const iso = selectedDate.toISOString().split('T')[0];
-              setDate(iso);
-            }
-          }}
-        />
-      )}
+        placeholder="YYYY-MM-DD"
+        value={date}
+        onChangeText={setDate}
+      />
 
       <Text style={styles.section}>Subject Supported</Text>
 
@@ -2305,8 +2277,6 @@ ${schoolChallenges}
 function DirectLearnerSupportScreen() {
   const [startDate, setStartDate] = React.useState('');
   const [endDate, setEndDate] = React.useState('');
-  const [showStartPicker, setShowStartPicker] = React.useState(false);
-  const [showEndPicker, setShowEndPicker] = React.useState(false);
   const [staffMember, setStaffMember] = React.useState('');
   const [subject, setSubject] = React.useState('');
   const [subjectSearch, setSubjectSearch] = React.useState('');
@@ -2456,50 +2426,20 @@ function DirectLearnerSupportScreen() {
       <Text style={styles.screenTitle}>Direct Learner Support</Text>
 
       <Text style={styles.section}>Start Date</Text>
-      <Pressable
+      <TextInput
         style={styles.input}
-        onPress={() => setShowStartPicker(true)}
-      >
-        <Text>{startDate || 'Select start date'}</Text>
-      </Pressable>
-
-      {showStartPicker && (
-        <DateTimePicker
-          value={startDate ? new Date(startDate) : new Date()}
-          mode="date"
-          display="default"
-          onChange={(event, selectedDate) => {
-            setShowStartPicker(false);
-            if (selectedDate) {
-              const iso = selectedDate.toISOString().split('T')[0];
-              setStartDate(iso);
-            }
-          }}
-        />
-      )}
+        placeholder="YYYY-MM-DD"
+        value={startDate}
+        onChangeText={setStartDate}
+      />
 
       <Text style={styles.section}>End Date</Text>
-      <Pressable
+      <TextInput
         style={styles.input}
-        onPress={() => setShowEndPicker(true)}
-      >
-        <Text>{endDate || 'Select end date'}</Text>
-      </Pressable>
-
-      {showEndPicker && (
-        <DateTimePicker
-          value={endDate ? new Date(endDate) : new Date()}
-          mode="date"
-          display="default"
-          onChange={(event, selectedDate) => {
-            setShowEndPicker(false);
-            if (selectedDate) {
-              const iso = selectedDate.toISOString().split('T')[0];
-              setEndDate(iso);
-            }
-          }}
-        />
-      )}
+        placeholder="YYYY-MM-DD"
+        value={endDate}
+        onChangeText={setEndDate}
+      />
 
       <Text style={styles.section}>Staff Member</Text>
       <TextInput

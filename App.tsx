@@ -1,13 +1,11 @@
-import * as React from 'react';
-import { View, Text, StyleSheet, Pressable, ScrollView, TextInput, Alert, Platform, Image, Modal } from 'react-native';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import { Picker } from '@react-native-picker/picker';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import * as FileSystem from 'expo-file-system/legacy';
 import * as MailComposer from 'expo-mail-composer';
 import * as Print from 'expo-print';
-import { Asset } from 'expo-asset';
-import * as FileSystem from 'expo-file-system/legacy';
+import * as React from 'react';
+import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
+import { Alert, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -283,16 +281,6 @@ function HomeScreen({ navigation }: any) {
       </Pressable>
 
       <Pressable
-        style={[styles.card, { backgroundColor: '#e2e8f0', borderColor: '#0b3d6d' }]}
-        onPress={() => navigation.navigate('Drafts')}
-      >
-        <Text style={styles.cardTitle}>Saved Drafts</Text>
-        <Text style={styles.cardText}>
-          View and open locally saved drafts
-        </Text>
-      </Pressable>
-
-      <Pressable
         style={[styles.card, { backgroundColor: '#fef3c7', borderColor: '#0b3d6d' }]}
         onPress={() => navigation.navigate('ExaminationMonitoring')}
       >
@@ -301,10 +289,21 @@ function HomeScreen({ navigation }: any) {
           NSC Examination Centre Readiness & Commitment Monitoring
         </Text>
       </Pressable>
+
+      <Pressable
+        style={[styles.card, { backgroundColor: '#e2e8f0', borderColor: '#0b3d6d' }]}
+        onPress={() => navigation.navigate('Drafts')}
+      >
+        <Text style={styles.cardTitle}>Saved Drafts</Text>
+        <Text style={styles.cardText}>
+          View and open locally saved drafts
+        </Text>
+      </Pressable>
     </ScrollView>
   );
 }
 function ExaminationMonitoringScreen() {
+    const [showDatePicker, setShowDatePicker] = React.useState(false);
   const [school, setSchool] = React.useState('');
   const [schoolSearch, setSchoolSearch] = React.useState('');
   const [showSchoolList, setShowSchoolList] = React.useState(false);
@@ -516,12 +515,22 @@ function ExaminationMonitoringScreen() {
       )}
 
       <Text style={styles.section}>Date</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="YYYY-MM-DD"
-        value={date}
-        onChangeText={setDate}
-      />
+      <Pressable style={styles.input} onPress={() => setShowDatePicker(true)}>
+        <Text>{date ? date : 'Select date'}</Text>
+      </Pressable>
+      {showDatePicker && (
+        <DateTimePicker
+          value={date ? new Date(date) : new Date()}
+          mode="date"
+          display="default"
+          onChange={(event: DateTimePickerEvent, selectedDate?: Date) => {
+            setShowDatePicker(false);
+            if (selectedDate) {
+              setDate(selectedDate.toISOString().split('T')[0]);
+            }
+          }}
+        />
+      )}
 
       <Text style={styles.section}>Monitor Name</Text>
       <TextInput style={styles.input} value={monitorName} onChangeText={setMonitorName} />
@@ -612,6 +621,7 @@ function ExaminationMonitoringScreen() {
 /* ---------------- GROUP SUPPORT SCREEN ---------------- */
 
 function GroupSupportScreen() {
+    const [showDatePicker, setShowDatePicker] = React.useState(false);
   const [staffMember, setStaffMember] = React.useState('');
   const [date, setDate] = React.useState('');
   const [subject, setSubject] = React.useState('');
@@ -807,12 +817,22 @@ function GroupSupportScreen() {
       <TextInput style={styles.input} value={staffMember} onChangeText={setStaffMember} />
 
       <Text style={styles.section}>Date</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="YYYY-MM-DD"
-        value={date}
-        onChangeText={setDate}
-      />
+      <Pressable style={styles.input} onPress={() => setShowDatePicker(true)}>
+        <Text>{date ? date : 'Select date'}</Text>
+      </Pressable>
+      {showDatePicker && (
+        <DateTimePicker
+          value={date ? new Date(date) : new Date()}
+          mode="date"
+          display="default"
+          onChange={(event: DateTimePickerEvent, selectedDate?: Date) => {
+            setShowDatePicker(false);
+            if (selectedDate) {
+              setDate(selectedDate.toISOString().split('T')[0]);
+            }
+          }}
+        />
+      )}
 
       <Text style={styles.section}>Subject Supported</Text>
 
@@ -929,13 +949,22 @@ function GroupSupportScreen() {
 function DraftsScreen({ navigation }: any) {
   const [schoolDraft, setSchoolDraft] = React.useState<any>(null);
   const [priorityDraft, setPriorityDraft] = React.useState<any>(null);
+  const [monitoringDraft, setMonitoringDraft] = React.useState<any>(null);
+  const [groupDraft, setGroupDraft] = React.useState<any>(null);
+  const [learnerDraft, setLearnerDraft] = React.useState<any>(null);
 
   React.useEffect(() => {
     const loadDrafts = async () => {
       const s = await AsyncStorage.getItem('SCHOOL_VISIT_DRAFT');
       const p = await AsyncStorage.getItem('PRIORITY_VISIT_DRAFT');
+      const m = await AsyncStorage.getItem('EXAM_MONITORING_DRAFT');
+      const g = await AsyncStorage.getItem('GROUP_SUPPORT_DRAFT');
+      const l = await AsyncStorage.getItem('DIRECT_LEARNER_SUPPORT_DRAFT');
       if (s) setSchoolDraft(JSON.parse(s));
       if (p) setPriorityDraft(JSON.parse(p));
+      if (m) setMonitoringDraft(JSON.parse(m));
+      if (g) setGroupDraft(JSON.parse(g));
+      if (l) setLearnerDraft(JSON.parse(l));
     };
     loadDrafts();
   }, []);
@@ -944,10 +973,21 @@ function DraftsScreen({ navigation }: any) {
     await AsyncStorage.removeItem('SCHOOL_VISIT_DRAFT');
     setSchoolDraft(null);
   };
-
   const deletePriorityDraft = async () => {
     await AsyncStorage.removeItem('PRIORITY_VISIT_DRAFT');
     setPriorityDraft(null);
+  };
+  const deleteMonitoringDraft = async () => {
+    await AsyncStorage.removeItem('EXAM_MONITORING_DRAFT');
+    setMonitoringDraft(null);
+  };
+  const deleteGroupDraft = async () => {
+    await AsyncStorage.removeItem('GROUP_SUPPORT_DRAFT');
+    setGroupDraft(null);
+  };
+  const deleteLearnerDraft = async () => {
+    await AsyncStorage.removeItem('DIRECT_LEARNER_SUPPORT_DRAFT');
+    setLearnerDraft(null);
   };
 
   return (
@@ -996,6 +1036,72 @@ function DraftsScreen({ navigation }: any) {
         </View>
       ) : (
         <Text style={{ marginTop: 8 }}>No saved Priority draft.</Text>
+      )}
+
+      <Text style={styles.section}>Examination Monitoring Draft</Text>
+      {monitoringDraft ? (
+        <View style={styles.box}>
+          <Text>School: {monitoringDraft.school || 'Not specified'}</Text>
+          <Text>Date: {monitoringDraft.date || 'Not specified'}</Text>
+          <Pressable
+            style={[styles.submitButton, { marginTop: 12 }]}
+            onPress={() => navigation.navigate('ExaminationMonitoring')}
+          >
+            <Text style={styles.submitText}>Open Monitoring Draft</Text>
+          </Pressable>
+          <Pressable
+            style={[styles.submitButton, { backgroundColor: '#b91c1c', marginTop: 8 }]}
+            onPress={deleteMonitoringDraft}
+          >
+            <Text style={styles.submitText}>Delete Monitoring Draft</Text>
+          </Pressable>
+        </View>
+      ) : (
+        <Text style={{ marginTop: 8 }}>No saved Examination Monitoring draft.</Text>
+      )}
+
+      <Text style={styles.section}>Group Support Draft</Text>
+      {groupDraft ? (
+        <View style={styles.box}>
+          <Text>Staff Member: {groupDraft.staffMember || 'Not specified'}</Text>
+          <Text>Date: {groupDraft.date || 'Not specified'}</Text>
+          <Pressable
+            style={[styles.submitButton, { marginTop: 12 }]}
+            onPress={() => navigation.navigate('GroupSupport')}
+          >
+            <Text style={styles.submitText}>Open Group Support Draft</Text>
+          </Pressable>
+          <Pressable
+            style={[styles.submitButton, { backgroundColor: '#b91c1c', marginTop: 8 }]}
+            onPress={deleteGroupDraft}
+          >
+            <Text style={styles.submitText}>Delete Group Support Draft</Text>
+          </Pressable>
+        </View>
+      ) : (
+        <Text style={{ marginTop: 8 }}>No saved Group Support draft.</Text>
+      )}
+
+      <Text style={styles.section}>Direct Learner Support Draft</Text>
+      {learnerDraft ? (
+        <View style={styles.box}>
+          <Text>Staff Member: {learnerDraft.staffMember || 'Not specified'}</Text>
+          <Text>Date: {learnerDraft.date || 'Not specified'}</Text>
+          <Pressable
+            style={[styles.submitButton, { marginTop: 12 }]}
+            onPress={() => navigation.navigate('DirectLearnerSupport')}
+          >
+            <Text style={styles.submitText}>Open Learner Support Draft</Text>
+          </Pressable>
+          <Pressable
+            style={[styles.submitButton, { backgroundColor: '#b91c1c', marginTop: 8 }]}
+            onPress={deleteLearnerDraft}
+          >
+            <Text style={styles.submitText}>Delete Learner Support Draft</Text>
+          </Pressable>
+        </View>
+      ) : (
+        <Text style={{ marginTop: 8 }}>No saved Direct Learner Support draft.</Text>
       )}
     </ScrollView>
   );
@@ -1584,7 +1690,7 @@ Advisor: ${advisor.name}
             Report Preview
           </Text>
 
-          <Text style={{ whiteSpace: 'pre-line' as any }}>
+          <Text>
             {previewContent}
           </Text>
 
@@ -2217,7 +2323,7 @@ ${schoolChallenges}
             Priority Report Preview
           </Text>
 
-          <Text style={{ whiteSpace: 'pre-line' as any }}>
+          <Text>
             {previewContent}
           </Text>
 
@@ -2275,6 +2381,8 @@ ${schoolChallenges}
 /* ---------------- DIRECT LEARNER SUPPORT SCREEN ---------------- */
 
 function DirectLearnerSupportScreen() {
+    const [showStartDatePicker, setShowStartDatePicker] = React.useState(false);
+    const [showEndDatePicker, setShowEndDatePicker] = React.useState(false);
   const [startDate, setStartDate] = React.useState('');
   const [endDate, setEndDate] = React.useState('');
   const [staffMember, setStaffMember] = React.useState('');
@@ -2426,20 +2534,40 @@ function DirectLearnerSupportScreen() {
       <Text style={styles.screenTitle}>Direct Learner Support</Text>
 
       <Text style={styles.section}>Start Date</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="YYYY-MM-DD"
-        value={startDate}
-        onChangeText={setStartDate}
-      />
+      <Pressable style={styles.input} onPress={() => setShowStartDatePicker(true)}>
+        <Text>{startDate ? startDate : 'Select start date'}</Text>
+      </Pressable>
+      {showStartDatePicker && (
+        <DateTimePicker
+          value={startDate ? new Date(startDate) : new Date()}
+          mode="date"
+          display="default"
+          onChange={(event: DateTimePickerEvent, selectedDate?: Date) => {
+            setShowStartDatePicker(false);
+            if (selectedDate) {
+              setStartDate(selectedDate.toISOString().split('T')[0]);
+            }
+          }}
+        />
+      )}
 
       <Text style={styles.section}>End Date</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="YYYY-MM-DD"
-        value={endDate}
-        onChangeText={setEndDate}
-      />
+      <Pressable style={styles.input} onPress={() => setShowEndDatePicker(true)}>
+        <Text>{endDate ? endDate : 'Select end date'}</Text>
+      </Pressable>
+      {showEndDatePicker && (
+        <DateTimePicker
+          value={endDate ? new Date(endDate) : new Date()}
+          mode="date"
+          display="default"
+          onChange={(event: DateTimePickerEvent, selectedDate?: Date) => {
+            setShowEndDatePicker(false);
+            if (selectedDate) {
+              setEndDate(selectedDate.toISOString().split('T')[0]);
+            }
+          }}
+        />
+      )}
 
       <Text style={styles.section}>Staff Member</Text>
       <TextInput
@@ -2743,9 +2871,9 @@ const styles = StyleSheet.create({
   /* ---------- INPUTS ---------- */
 
   pickerBox: {
-    position: 'absolute',
-    zIndex: 1000,
-    elevation: 10,
+    position: 'relative',
+    zIndex: 1,
+    elevation: 1,
     left: 0,
     right: 0,
     marginTop: 4,

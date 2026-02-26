@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { View, Text, StyleSheet, Pressable, ScrollView, TextInput, Alert, Platform, Image, Modal } from 'react-native';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { Picker } from '@react-native-picker/picker';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -298,6 +299,7 @@ function HomeScreen({ navigation }: any) {
 function GroupSupportScreen() {
   const [staffMember, setStaffMember] = React.useState('');
   const [date, setDate] = React.useState('');
+  const [showDatePicker, setShowDatePicker] = React.useState(false);
   const [subject, setSubject] = React.useState('');
   const [subjectSearch, setSubjectSearch] = React.useState('');
   const [showSubjectList, setShowSubjectList] = React.useState(false);
@@ -308,13 +310,16 @@ function GroupSupportScreen() {
   const [actualAttendees, setActualAttendees] = React.useState('');
   const [generalComments, setGeneralComments] = React.useState('');
   const [schoolsOfConcern, setSchoolsOfConcern] = React.useState('');
-  const [school, setSchool] = React.useState('');
   const [schoolSearch, setSchoolSearch] = React.useState('');
   const [showSchoolList, setShowSchoolList] = React.useState(false);
+  const [selectedSchools, setSelectedSchools] = React.useState<string[]>([]);
 
-  const filteredSchools = SCHOOL_LIST.filter((s) =>
-    s.toLowerCase().includes(schoolSearch.toLowerCase())
-  );
+  const filteredSchools =
+    schoolSearch.trim().length === 0
+      ? SCHOOL_LIST
+      : SCHOOL_LIST.filter((s) =>
+          s.toLowerCase().includes(schoolSearch.toLowerCase())
+        );
 
   const subjects = SUBJECT_LIST;
 
@@ -336,10 +341,18 @@ function GroupSupportScreen() {
     'Other'
   ];
 
+  const toggleSchool = (item: string) => {
+    setSelectedSchools((prev) =>
+      prev.includes(item)
+        ? prev.filter((i) => i !== item)
+        : [...prev, item]
+    );
+  };
+
   const submitGroupSupport = async () => {
     const payload = {
       tool: "group_support",
-      school,
+      schoolsInvolved: selectedSchools,
       staffMember,
       date,
       subject,
@@ -374,34 +387,40 @@ function GroupSupportScreen() {
       <View style={styles.headerBar} />
       <Text style={styles.screenTitle}>Group Support</Text>
 
-      <Text style={styles.section}>School</Text>
+      <Text style={styles.section}>Schools Involved</Text>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Search school..."
-        value={schoolSearch}
-        onChangeText={(text) => {
-          setSchoolSearch(text);
-          setShowSchoolList(true);
-        }}
-        onFocus={() => setShowSchoolList(true)}
-      />
+      <Pressable
+        style={[styles.input, { justifyContent: 'center' }]}
+        onPress={() => setShowSchoolList(!showSchoolList)}
+      >
+        <Text>
+          {selectedSchools.length > 0
+            ? `${selectedSchools.length} school(s) selected`
+            : 'Select schools'}
+        </Text>
+      </Pressable>
 
       {showSchoolList && (
-        <View style={[styles.pickerBox, { maxHeight: 220 }]}>
-          <ScrollView>
+        <View style={[styles.pickerBox, { maxHeight: 300 }]}>
+          <TextInput
+            style={styles.input}
+            placeholder="Search school..."
+            value={schoolSearch}
+            onChangeText={setSchoolSearch}
+          />
+
+          <ScrollView
+            keyboardShouldPersistTaps="always"
+            showsVerticalScrollIndicator={true}
+          >
             {filteredSchools.map((s) => (
               <Pressable
                 key={s}
                 style={[
                   styles.checkbox,
-                  school === s && styles.checkboxSelected,
+                  selectedSchools.includes(s) && styles.checkboxSelected,
                 ]}
-                onPress={() => {
-                  setSchool(s);
-                  setSchoolSearch(s);
-                  setShowSchoolList(false);
-                }}
+                onPress={() => toggleSchool(s)}
               >
                 <Text>{s}</Text>
               </Pressable>
@@ -414,12 +433,27 @@ function GroupSupportScreen() {
       <TextInput style={styles.input} value={staffMember} onChangeText={setStaffMember} />
 
       <Text style={styles.section}>Date</Text>
-      <TextInput
+      <Pressable
         style={styles.input}
-        placeholder="YYYY-MM-DD"
-        value={date}
-        onChangeText={setDate}
-      />
+        onPress={() => setShowDatePicker(true)}
+      >
+        <Text>{date || 'Select date'}</Text>
+      </Pressable>
+
+      {showDatePicker && (
+        <DateTimePicker
+          value={date ? new Date(date) : new Date()}
+          mode="date"
+          display="default"
+          onChange={(event, selectedDate) => {
+            setShowDatePicker(false);
+            if (selectedDate) {
+              const iso = selectedDate.toISOString().split('T')[0];
+              setDate(iso);
+            }
+          }}
+        />
+      )}
 
       <Text style={styles.section}>Subject Supported</Text>
 
@@ -1878,6 +1912,8 @@ ${schoolChallenges}
 function DirectLearnerSupportScreen() {
   const [startDate, setStartDate] = React.useState('');
   const [endDate, setEndDate] = React.useState('');
+  const [showStartPicker, setShowStartPicker] = React.useState(false);
+  const [showEndPicker, setShowEndPicker] = React.useState(false);
   const [staffMember, setStaffMember] = React.useState('');
   const [subject, setSubject] = React.useState('');
   const [subjectSearch, setSubjectSearch] = React.useState('');
@@ -1970,20 +2006,50 @@ function DirectLearnerSupportScreen() {
       <Text style={styles.screenTitle}>Direct Learner Support</Text>
 
       <Text style={styles.section}>Start Date</Text>
-      <TextInput
+      <Pressable
         style={styles.input}
-        placeholder="YYYY-MM-DD"
-        value={startDate}
-        onChangeText={setStartDate}
-      />
+        onPress={() => setShowStartPicker(true)}
+      >
+        <Text>{startDate || 'Select start date'}</Text>
+      </Pressable>
+
+      {showStartPicker && (
+        <DateTimePicker
+          value={startDate ? new Date(startDate) : new Date()}
+          mode="date"
+          display="default"
+          onChange={(event, selectedDate) => {
+            setShowStartPicker(false);
+            if (selectedDate) {
+              const iso = selectedDate.toISOString().split('T')[0];
+              setStartDate(iso);
+            }
+          }}
+        />
+      )}
 
       <Text style={styles.section}>End Date</Text>
-      <TextInput
+      <Pressable
         style={styles.input}
-        placeholder="YYYY-MM-DD"
-        value={endDate}
-        onChangeText={setEndDate}
-      />
+        onPress={() => setShowEndPicker(true)}
+      >
+        <Text>{endDate || 'Select end date'}</Text>
+      </Pressable>
+
+      {showEndPicker && (
+        <DateTimePicker
+          value={endDate ? new Date(endDate) : new Date()}
+          mode="date"
+          display="default"
+          onChange={(event, selectedDate) => {
+            setShowEndPicker(false);
+            if (selectedDate) {
+              const iso = selectedDate.toISOString().split('T')[0];
+              setEndDate(iso);
+            }
+          }}
+        />
+      )}
 
       <Text style={styles.section}>Staff Member</Text>
       <TextInput

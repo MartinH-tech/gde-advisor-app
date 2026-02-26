@@ -296,6 +296,7 @@ function HomeScreen({ navigation }: any) {
 }
 
 function ExaminationMonitoringScreen() {
+  const [showDatePicker, setShowDatePicker] = React.useState(false);
 
   /* ---------------- SECTION A: CENTRE DETAILS ---------------- */
 
@@ -468,7 +469,58 @@ function ExaminationMonitoringScreen() {
       <TextInput style={styles.input} placeholder="Monitor Name" value={monitorName} onChangeText={setMonitorName} />
       <TextInput style={styles.input} placeholder="Office" value={office} onChangeText={setOffice} />
       <TextInput style={styles.input} placeholder="Monitor Contact" value={monitorContact} onChangeText={setMonitorContact} />
-      <TextInput style={styles.input} placeholder="Date (YYYY-MM-DD)" value={date} onChangeText={setDate} />
+      <Text style={styles.section}>Date</Text>
+      {Platform.OS === 'web' ? (
+        <input
+          type="date"
+          className="web-date-input"
+          style={{ ...styles.input, color: '#0b3d6d', background: '#e0e7ef', border: 'none', fontSize: 16, padding: 10, borderRadius: 10, marginTop: 8 }}
+          value={date}
+          onChange={e => setDate(e.target.value)}
+        />
+      ) : (
+        <>
+          <Pressable style={styles.input} onPress={() => setShowDatePicker(true)}>
+            <Text>{date ? date : 'Select date'}</Text>
+          </Pressable>
+          {showDatePicker && (
+            Platform.OS === 'android' ? (
+              <DateTimePicker
+                value={date ? new Date(date) : new Date()}
+                mode="date"
+                display="default"
+                onChange={(event: DateTimePickerEvent, selectedDate?: Date) => {
+                  setShowDatePicker(false);
+                  if (selectedDate) {
+                    setDate(selectedDate.toISOString().split('T')[0]);
+                  }
+                }}
+              />
+            ) : (
+              <Modal transparent={true} visible={showDatePicker} animationType="slide">
+                <View style={{ flex: 1, justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.3)' }}>
+                  <View style={{ backgroundColor: 'white', margin: 24, borderRadius: 8, padding: 16 }}>
+                    <DateTimePicker
+                      value={date ? new Date(date) : new Date()}
+                      mode="date"
+                      display="spinner"
+                      onChange={(event: DateTimePickerEvent, selectedDate?: Date) => {
+                        if (event.type === 'set' && selectedDate) {
+                          setDate(selectedDate.toISOString().split('T')[0]);
+                        }
+                        setShowDatePicker(false);
+                      }}
+                    />
+                    <Pressable onPress={() => setShowDatePicker(false)} style={{ marginTop: 8, alignItems: 'center' }}>
+                      <Text style={{ color: '#007AFF', fontWeight: 'bold' }}>Done</Text>
+                    </Pressable>
+                  </View>
+                </View>
+              </Modal>
+            )
+          )}
+        </>
+      )}
       <TextInput style={styles.input} placeholder="Time of Arrival" value={arrivalTime} onChangeText={setArrivalTime} />
       <TextInput style={styles.input} placeholder="Time of Departure" value={departureTime} onChangeText={setDepartureTime} />
       <TextInput style={styles.input} placeholder="Subject(s)" value={subjects} onChangeText={setSubjects} />
@@ -2474,85 +2526,109 @@ function DirectLearnerSupportScreen() {
       <Text style={styles.screenTitle}>Direct Learner Support</Text>
 
       <Text style={styles.section}>Start Date</Text>
-      <Pressable style={styles.input} onPress={() => setShowStartDatePicker(true)}>
-        <Text>{startDate ? startDate : 'Select start date'}</Text>
-      </Pressable>
-      {showStartDatePicker && (
-        Platform.OS === 'android' ? (
-          <DateTimePicker
-            value={startDate ? new Date(startDate) : new Date()}
-            mode="date"
-            display="default"
-            onChange={(event: DateTimePickerEvent, selectedDate?: Date) => {
-              setShowStartDatePicker(false);
-              if (selectedDate) {
-                setStartDate(selectedDate.toISOString().split('T')[0]);
-              }
-            }}
-          />
-        ) : (
-          <Modal transparent={true} visible={showStartDatePicker} animationType="slide">
-            <View style={{ flex: 1, justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.3)' }}>
-              <View style={{ backgroundColor: 'white', margin: 24, borderRadius: 8, padding: 16 }}>
-                <DateTimePicker
-                  value={startDate ? new Date(startDate) : new Date()}
-                  mode="date"
-                  display="spinner"
-                  onChange={(event: DateTimePickerEvent, selectedDate?: Date) => {
-                    if (event.type === 'set' && selectedDate) {
-                      setStartDate(selectedDate.toISOString().split('T')[0]);
-                    }
-                    setShowStartDatePicker(false);
-                  }}
-                />
-                <Pressable onPress={() => setShowStartDatePicker(false)} style={{ marginTop: 8, alignItems: 'center' }}>
-                  <Text style={{ color: '#007AFF', fontWeight: 'bold' }}>Done</Text>
-                </Pressable>
-              </View>
-            </View>
-          </Modal>
-        )
+      {Platform.OS === 'web' ? (
+        <input
+          type="date"
+          className="web-date-input"
+          style={{ ...styles.input, color: '#0b3d6d', background: '#e0e7ef', border: 'none', fontSize: 16, padding: 10, borderRadius: 10, marginTop: 8 }}
+          value={startDate}
+          onChange={e => setStartDate(e.target.value)}
+        />
+      ) : (
+        <>
+          <Pressable style={styles.input} onPress={() => setShowStartDatePicker(true)}>
+            <Text>{startDate ? startDate : 'Select start date'}</Text>
+          </Pressable>
+          {showStartDatePicker && (
+            Platform.OS === 'android' ? (
+              <DateTimePicker
+                value={startDate ? new Date(startDate) : new Date()}
+                mode="date"
+                display="default"
+                onChange={(event: DateTimePickerEvent, selectedDate?: Date) => {
+                  setShowStartDatePicker(false);
+                  if (selectedDate) {
+                    setStartDate(selectedDate.toISOString().split('T')[0]);
+                  }
+                }}
+              />
+            ) : (
+              <Modal transparent={true} visible={showStartDatePicker} animationType="slide">
+                <View style={{ flex: 1, justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.3)' }}>
+                  <View style={{ backgroundColor: 'white', margin: 24, borderRadius: 8, padding: 16 }}>
+                    <DateTimePicker
+                      value={startDate ? new Date(startDate) : new Date()}
+                      mode="date"
+                      display="spinner"
+                      onChange={(event: DateTimePickerEvent, selectedDate?: Date) => {
+                        if (event.type === 'set' && selectedDate) {
+                          setStartDate(selectedDate.toISOString().split('T')[0]);
+                        }
+                        setShowStartDatePicker(false);
+                      }}
+                    />
+                    <Pressable onPress={() => setShowStartDatePicker(false)} style={{ marginTop: 8, alignItems: 'center' }}>
+                      <Text style={{ color: '#007AFF', fontWeight: 'bold' }}>Done</Text>
+                    </Pressable>
+                  </View>
+                </View>
+              </Modal>
+            )
+          )}
+        </>
       )}
 
       <Text style={styles.section}>End Date</Text>
-      <Pressable style={styles.input} onPress={() => setShowEndDatePicker(true)}>
-        <Text>{endDate ? endDate : 'Select end date'}</Text>
-      </Pressable>
-      {showEndDatePicker && (
-        Platform.OS === 'android' ? (
-          <DateTimePicker
-            value={endDate ? new Date(endDate) : new Date()}
-            mode="date"
-            display="default"
-            onChange={(event: DateTimePickerEvent, selectedDate?: Date) => {
-              setShowEndDatePicker(false);
-              if (selectedDate) {
-                setEndDate(selectedDate.toISOString().split('T')[0]);
-              }
-            }}
-          />
-        ) : (
-          <Modal transparent={true} visible={showEndDatePicker} animationType="slide">
-            <View style={{ flex: 1, justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.3)' }}>
-              <View style={{ backgroundColor: 'white', margin: 24, borderRadius: 8, padding: 16 }}>
-                <DateTimePicker
-                  value={endDate ? new Date(endDate) : new Date()}
-                  mode="date"
-                  display="spinner"
-                  onChange={(event: DateTimePickerEvent, selectedDate?: Date) => {
-                    if (event.type === 'set' && selectedDate) {
-                      setEndDate(selectedDate.toISOString().split('T')[0]);
-                    }
-                    setShowEndDatePicker(false);
-                  }}
-                />
-                <Pressable onPress={() => setShowEndDatePicker(false)} style={{ marginTop: 8, alignItems: 'center' }}>
-                  <Text style={{ color: '#007AFF', fontWeight: 'bold' }}>Done</Text>
-                </Pressable>
-              </View>
-            </View>
-          </Modal>
-        )
+      {Platform.OS === 'web' ? (
+        <input
+          type="date"
+          className="web-date-input"
+          style={{ ...styles.input, color: '#0b3d6d', background: '#e0e7ef', border: 'none', fontSize: 16, padding: 10, borderRadius: 10, marginTop: 8 }}
+          value={endDate}
+          onChange={e => setEndDate(e.target.value)}
+        />
+      ) : (
+        <>
+          <Pressable style={styles.input} onPress={() => setShowEndDatePicker(true)}>
+            <Text>{endDate ? endDate : 'Select end date'}</Text>
+          </Pressable>
+          {showEndDatePicker && (
+            Platform.OS === 'android' ? (
+              <DateTimePicker
+                value={endDate ? new Date(endDate) : new Date()}
+                mode="date"
+                display="default"
+                onChange={(event: DateTimePickerEvent, selectedDate?: Date) => {
+                  setShowEndDatePicker(false);
+                  if (selectedDate) {
+                    setEndDate(selectedDate.toISOString().split('T')[0]);
+                  }
+                }}
+              />
+            ) : (
+              <Modal transparent={true} visible={showEndDatePicker} animationType="slide">
+                <View style={{ flex: 1, justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.3)' }}>
+                  <View style={{ backgroundColor: 'white', margin: 24, borderRadius: 8, padding: 16 }}>
+                    <DateTimePicker
+                      value={endDate ? new Date(endDate) : new Date()}
+                      mode="date"
+                      display="spinner"
+                      onChange={(event: DateTimePickerEvent, selectedDate?: Date) => {
+                        if (event.type === 'set' && selectedDate) {
+                          setEndDate(selectedDate.toISOString().split('T')[0]);
+                        }
+                        setShowEndDatePicker(false);
+                      }}
+                    />
+                    <Pressable onPress={() => setShowEndDatePicker(false)} style={{ marginTop: 8, alignItems: 'center' }}>
+                      <Text style={{ color: '#007AFF', fontWeight: 'bold' }}>Done</Text>
+                    </Pressable>
+                  </View>
+                </View>
+              </Modal>
+            )
+          )}
+        </>
       )}
 
       <Text style={styles.section}>Staff Member</Text>
@@ -2800,7 +2876,7 @@ const styles = StyleSheet.create({
     minHeight: '100%',
     padding: 24,
     paddingBottom: 80,
-    backgroundColor: '#0b3d6d',
+    backgroundColor: '#25477a', // lighter navy
   },
 
   /* ---------- HEADER & TITLES ---------- */
@@ -2825,7 +2901,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '700',
     marginBottom: 14,
-    color: '#0f172a',
+    color: '#fff', // white for better contrast
   },
 
   /* ---------- CARDS ---------- */
@@ -2866,7 +2942,7 @@ const styles = StyleSheet.create({
   section: {
     marginTop: 26,
     fontWeight: '600',
-    color: '#0f172a',
+    color: '#fff', // white for better contrast
     fontSize: 15,
   },
 
@@ -2899,8 +2975,8 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 10,
     marginTop: 8,
-    backgroundColor: '#13294b',
-    color: '#ffcc00',
+    backgroundColor: '#fff', // white background for required fields
+    color: '#111', // black text for readability
   },
 
   textArea: {
@@ -2911,8 +2987,8 @@ const styles = StyleSheet.create({
     marginTop: 10,
     minHeight: 100,
     textAlignVertical: 'top',
-    backgroundColor: '#13294b',
-    color: '#ffcc00',
+    backgroundColor: '#fff', // white background for required fields
+    color: '#111', // black text for readability
   },
 
   /* ---------- CHECKBOXES ---------- */
@@ -2923,11 +2999,11 @@ const styles = StyleSheet.create({
     padding: 12,
     marginTop: 10,
     borderRadius: 10,
-    backgroundColor: '#ffffff',
+    backgroundColor: '#fff', // always white when not selected
   },
 
   checkboxSelected: {
-    backgroundColor: '#ffcc00',
+    backgroundColor: '#fff9c4', // lighter yellow when selected
     borderColor: '#0b3d6d',
   },
 

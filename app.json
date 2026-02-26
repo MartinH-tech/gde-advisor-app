@@ -4,7 +4,11 @@
     "slug": "gde-advisor-app",
     "version": "2.1.0",
     "orientation": "portrait",
-    "platforms": ["ios", "android", "web"],
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
     "icon": "./assets/gde-icon-512x512.png",
     "scheme": "gdeadvisor",
     "userInterfaceStyle": "automatic",
@@ -36,6 +40,9 @@
       "eas": {
         "projectId": "6555952c-72cd-4db2-a779-85bf5f08a7e7"
       }
-    }
+    },
+    "plugins": [
+      "@react-native-community/datetimepicker"
+    ]
   }
 }

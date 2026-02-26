@@ -7,7 +7,229 @@ import * as MailComposer from 'expo-mail-composer';
 import * as Print from 'expo-print';
 import { Asset } from 'expo-asset';
 import * as FileSystem from 'expo-file-system/legacy';
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
+/* ---------------- SHARED SCHOOL LIST ---------------- */
+
+const SCHOOL_LIST = [
+  'AFRIKAANSE HOËR MEISIESKOOL',
+  'AFRIKAANSE HOËR SEUNSKOOL',
+  'AL GHAZALI INDEPENDENT SCHOOL',
+  'AL-ASR EDUCATIONAL INSTITUTE',
+  'AMITY INTERNATIONAL',
+  'AMBERFIELD COLLEGE',
+  'BOKGONI TECHNICAL SECONDARY SCHOOL',
+  'BONA LESEDI SECONDARY SCHOOL',
+  'BOPHELONG COMMUNITY INDEPENDENT SCHOOL',
+  'CAPITAL CITY ACADEMY',
+  'CARPE DIEM ACADEMY',
+  'CENTRAL ISLAMIC SCHOOL',
+  'CENTURION SECONDARY SCHOOL',
+  'CORNERSTONE COLLEGE SEC. SCHOOL',
+  'CURRO COLLEGE PRETORIA',
+  'CURRO COLLEGE MAMELODI',
+  'DANSA INTERNATIONAL COLLEGE',
+  'DAVID HELLEN PETA SECONDARY SCHOOL',
+  'DR WF NKOMO SECONDARY SCHOOL',
+  'DUO EDU SENIORONAFHANKLIKE SKOOL',
+  'EDWARD PHATUDI SECONDARY SCHOOL',
+  'EERSTERUST SECONDARY SCHOOL',
+  'ELMAR COLLEGE',
+  'EMPRO ACADEMY',
+  'FLAVIUS MAREKA SECONDARY SCHOOL',
+  'FOUNDERS COMMUNITY SCHOOL',
+  'GATANG SECONDARY SCHOOL',
+  'GAUTENG CENTRAL COLLEGE',
+  'GLENMARK CHRISTIAN COLLEGE',
+  'GREENWOOD COLLEGE',
+  'HIMALAYA SECONDARY SCHOOL',
+  'HOËRSKOOL CENTURION',
+  'HOËRSKOOL DIE WILGERS',
+  'HOËRSKOOL ELDORAIGNE',
+  'HOËRSKOOL F H ODENDAAL',
+  'HOËRSKOOL GARSFONTEIN',
+  'HOËRSKOOL MENLOPARK',
+  'HOËRSKOOL SILVERTON',
+  'HOËRSKOOL UITSIG',
+  'HOËRSKOOL VOORTREKKERHOOGTE',
+  'HOËRSKOOL WATERKLOOF',
+  'HOËRSKOOL ZWARTKOP',
+  'HOFMEYR SECONDARY SCHOOL',
+  'HOLY TRINITY HIGH SCHOOL (CATHOLIC SEC.)',
+  'J KEKANA SECONDARY SCHOOL',
+  'JAFTA MAHLANGU SECONDARY SCHOOL',
+  'LAKEWOOD COLLEGE',
+  'LAUDIUM SECONDARY SCHOOL',
+  'LEHLABILE SECONDARY SCHOOL',
+  'LIMELIGHT ACADEMY',
+  'LOMPEC INDEPENDENT SECONDARY SCHOOL',
+  'LORETO CONVENT SCHOOL',
+  'LYTTELTON MANOR HIGH SCHOOL',
+  'MAHUBE VALLEY SECONDARY SCHOOL',
+  'MAMELODI SECONDARY SCHOOL',
+  'MBOWENI SECONDARY SCHOOL',
+  'MODIRI TECHNICAL SCHOOL',
+  'NELLMAPIUS SECONDARY SCHOOL',
+  'NUWE HOOPSKOOL',
+  'OLIEVENHOUTBOSCH SECONDARY SCHOOL',
+  'OLIEVENHOUTBOSCH SECONDARY SCHOOL NO 2',
+  'PEPPS MOTHEONG PRIMARY SCHOOL',
+  'PHATENG SECONDARY SCHOOL',
+  'PHELINDABA SECONDARY SCHOOL',
+  "PRETORIA BOYS' HIGH SCHOOL",
+  'PRETORIA CENTRAL HIGH SCHOOL',
+  'PRETORIA HIGH SCHOOL FOR GIRLS',
+  'PRETORIA INSTITUTE OF LEARNING',
+  'PRETORIA MUSLIM TRUST SUNNI SCHOOL',
+  'PRETORIA SECONDARY SCHOOL',
+  'PRETORIA TECHNICAL HIGH SCHOOL',
+  'PRINCEFIELD TRUST SCHOOL',
+  'PRINCESS PARK COLLEGE',
+  'PRO ARTE ALPHEN PARK',
+  'PROSPERITUS SECONDARY SCHOOL',
+  'QUEENS PRIVATE SCHOOL',
+  'RASLOUW ACADEMY',
+  'REPHAFOGILE SECONDARY SCHOOL',
+  'RIBANE-LAKA SECONDARY SCHOOL',
+  'RIETVLEI AKADEMIE',
+  'ROSINA SEDIBANE-MODIBA SCHOOL',
+  'SAULRIDGE SECONDARY SCHOOL',
+  'SESHEGONG SECONDARY SCHOOL',
+  'SOLOMON MAHLANGU FREEDOM SCHOOL',
+  'SONITUSSKOOL',
+  'ST AQUINAS-PRETORIA CAMPUS',
+  'STANZA BOPAPE SECONDARY SCHOOL',
+  'STAR COLLEGE PRETORIA',
+  'STEVE TSWETE SECONDARY SCHOOL',
+  'SUTHERLAND HIGH SCHOOL',
+  'THE GLEN HIGH SCHOOL',
+  'THE WAY CHRISTIAN SCHOOL',
+  'THUTO BOHLALE SECONDARY SCHOOL',
+  'TRANSORANJE SCHOOL FOR THE DEAF',
+  'TRANSVALIASKOOL-SCHOOL',
+  'TSAKO THABO SECONDARY SCHOOL',
+  'TSHWANE COLLEGE',
+  'TSHWANE MUSLIM SCHOOL',
+  'TSHWANE SECONDARY SCHOOL',
+  'TUKSSPORT HIGH SCHOOL',
+  'VERITAS ACADEMICS',
+  'VLAKFONTEIN SECONDARY SCHOOL',
+  'VUKANI MAWETHU SECONDARY SCHOOL',
+  'WATERSRAND SECONDARY SCHOOL',
+  'WIERDA INDEPENDENT SCHOOL',
+  'WILLOWRIDGE HIGH SCHOOL',
+];
+
+/* ---------------- SHARED SUBJECT LIST ---------------- */
+
+const SUBJECT_LIST = [
+  'Accounting',
+  'Afrikaans First Additional Language',
+  'Afrikaans Home Language',
+  'Afrikaans Second Additional Language',
+  'Agricultural Management Practices',
+  'Agricultural Science',
+  'Agricultural Technology',
+  'Arabic Second Additional Language',
+  'Business Studies',
+  'Civil Technology (Civil Services)',
+  'Civil Technology (Construction)',
+  'Civil Technology (Woodworking)',
+  'Computer Applications Technology',
+  'Consumer Studies',
+  'Dance Studies',
+  'Design',
+  'Dramatic Arts',
+  'Economics',
+  'Electrical Technology (Digital Systems)',
+  'Electrical Technology (Electronics)',
+  'Electrical Technology (Power Systems)',
+  'Engineering Graphics and Design',
+  'English First Additional Language',
+  'English Home Language',
+  'English Second Additional Language',
+  'Equine Studies',
+  'French Second Additional Language',
+  'Geography',
+  'German Home Language',
+  'German Second Additional Language',
+  'Gujarati First Additional Language',
+  'Gujarati Home Language',
+  'Gujarati Second Additional Language',
+  'Hebrew Second Additional Language',
+  'Hindi First Additional Language',
+  'Hindi Home Language',
+  'Hindi Second Additional Language',
+  'History',
+  'Hospitality Studies',
+  'Information Technology',
+  'IsiNdebele First Additional Language',
+  'IsiNdebele Home Language',
+  'IsiNdebele Second Additional Language',
+  'IsiXhosa First Additional Language',
+  'IsiXhosa Home Language',
+  'IsiXhosa Second Additional Language',
+  'IsiZulu First Additional Language',
+  'IsiZulu Home Language',
+  'IsiZulu Second Additional Language',
+  'Italian Second Additional Language',
+  'Latin Second Additional Language',
+  'Life Orientation',
+  'Life Sciences',
+  'Mandarin Second Additional Language',
+  'Marine Sciences',
+  'Maritime Economics',
+  'Mathematical Literacy',
+  'Mathematics',
+  'Mechanical Technology (Automotive)',
+  'Mechanical Technology (Fitting and Machining)',
+  'Mechanical Technology (Welding and Metal Work)',
+  'Modern Greek Second Additional Language',
+  'Music',
+  'Nautical Science',
+  'Physical Sciences',
+  'Portuguese First Additional Language',
+  'Portuguese Home Language',
+  'Portuguese Second Additional Language',
+  'Religion Studies',
+  'Sepedi First Additional Language',
+  'Sepedi Home Language',
+  'Sepedi Second Additional Language',
+  'Serbian Home Language',
+  'Serbian Second Additional Language',
+  'Sesotho First Additional Language',
+  'Sesotho Home Language',
+  'Sesotho Second Additional Language',
+  'Setswana First Additional Language',
+  'Setswana Home Language',
+  'Setswana Second Additional Language',
+  'SiSwati First Additional Language',
+  'SiSwati Home Language',
+  'SiSwati Second Additional Language',
+  'South African Sign Language Home Language',
+  'Spanish Second Additional Language',
+  'Sport and Exercise Science',
+  'Tamil First Additional Language',
+  'Tamil Home Language',
+  'Tamil Second Additional Language',
+  'Technical Mathematics',
+  'Technical Sciences',
+  'Telegu First Additional Language',
+  'Telegu Home Language',
+  'Telegu Second Additional Language',
+  'Tourism',
+  'Tshivenda First Additional Language',
+  'Tshivenda Home Language',
+  'Tshivenda Second Additional Language',
+  'Urdu First Additional Language',
+  'Urdu Home Language',
+  'Urdu Second Additional Language',
+  'Visual Arts',
+  'Xitsonga First Additional Language',
+  'Xitsonga Home Language',
+  'Xitsonga Second Additional Language',
+];
 
 /* ---------------- HOME SCREEN ---------------- */
 
@@ -40,6 +262,26 @@ function HomeScreen({ navigation }: any) {
       </Pressable>
 
       <Pressable
+        style={[styles.card, { backgroundColor: '#e6f4ff', borderColor: '#0b3d6d' }]}
+        onPress={() => navigation.navigate('DirectLearnerSupport')}
+      >
+        <Text style={styles.cardTitle}>Direct Learner Support</Text>
+        <Text style={styles.cardText}>
+          Track structured learner support interventions
+        </Text>
+      </Pressable>
+
+      <Pressable
+        style={[styles.card, { backgroundColor: '#eef2ff', borderColor: '#0b3d6d' }]}
+        onPress={() => navigation.navigate('GroupSupport')}
+      >
+        <Text style={styles.cardTitle}>Group Support</Text>
+        <Text style={styles.cardText}>
+          Record cluster, PLC and structured group support meetings
+        </Text>
+      </Pressable>
+
+      <Pressable
         style={[styles.card, { backgroundColor: '#e2e8f0', borderColor: '#0b3d6d' }]}
         onPress={() => navigation.navigate('Drafts')}
       >
@@ -48,7 +290,239 @@ function HomeScreen({ navigation }: any) {
           View and open locally saved drafts
         </Text>
       </Pressable>
-    </View>
+      </View>
+    );
+}
+/* ---------------- GROUP SUPPORT SCREEN ---------------- */
+
+function GroupSupportScreen() {
+  const [staffMember, setStaffMember] = React.useState('');
+  const [date, setDate] = React.useState('');
+  const [subject, setSubject] = React.useState('');
+  const [subjectSearch, setSubjectSearch] = React.useState('');
+  const [showSubjectList, setShowSubjectList] = React.useState(false);
+  const [meetingType, setMeetingType] = React.useState('');
+  const [otherMeetingType, setOtherMeetingType] = React.useState('');
+  const [focus, setFocus] = React.useState('');
+  const [expectedAttendees, setExpectedAttendees] = React.useState('');
+  const [actualAttendees, setActualAttendees] = React.useState('');
+  const [generalComments, setGeneralComments] = React.useState('');
+  const [schoolsOfConcern, setSchoolsOfConcern] = React.useState('');
+  const [school, setSchool] = React.useState('');
+  const [schoolSearch, setSchoolSearch] = React.useState('');
+  const [showSchoolList, setShowSchoolList] = React.useState(false);
+
+  const filteredSchools = SCHOOL_LIST.filter((s) =>
+    s.toLowerCase().includes(schoolSearch.toLowerCase())
+  );
+
+  const subjects = SUBJECT_LIST;
+
+  const filteredSubjects = subjects.filter((s) =>
+    s.toLowerCase().includes(subjectSearch.toLowerCase())
+  );
+
+  const meetingTypes = [
+    'DH Meeting',
+    'Cluster Moderation Meeting',
+    "Deputy Principals' Meeting",
+    'PLC Meeting',
+    'Roadshow',
+    'SAT Meeting',
+    'Small group meeting',
+    'SMT Workshop',
+    'Subject meeting',
+    'Workshop',
+    'Other'
+  ];
+
+  const submitGroupSupport = async () => {
+    const payload = {
+      tool: "group_support",
+      school,
+      staffMember,
+      date,
+      subject,
+      meetingType,
+      otherMeetingType,
+      focus,
+      expectedAttendees,
+      actualAttendees,
+      generalComments,
+      schoolsOfConcern
+    };
+
+    const jsonBody = JSON.stringify(payload, null, 2);
+
+    if (Platform.OS === "web") {
+      const mailtoUrl = `mailto:martinharmse@gdets.onmicrosoft.com?subject=${encodeURIComponent(
+        "GDE_TS_GROUP_SUPPORT"
+      )}&body=${encodeURIComponent(jsonBody)}`;
+      window.location.href = mailtoUrl;
+    } else {
+      await MailComposer.composeAsync({
+        recipients: ["martinharmse@gdets.onmicrosoft.com"],
+        subject: "GDE_TS_GROUP_SUPPORT",
+        body: jsonBody,
+        isHtml: false,
+      });
+    }
+  };
+
+  return (
+    <ScrollView contentContainerStyle={styles.scrollContainer}>
+      <View style={styles.headerBar} />
+      <Text style={styles.screenTitle}>Group Support</Text>
+
+      <Text style={styles.section}>School</Text>
+
+      <TextInput
+        style={styles.input}
+        placeholder="Search school..."
+        value={schoolSearch}
+        onChangeText={(text) => {
+          setSchoolSearch(text);
+          setShowSchoolList(true);
+        }}
+        onFocus={() => setShowSchoolList(true)}
+      />
+
+      {showSchoolList && (
+        <View style={[styles.pickerBox, { maxHeight: 220 }]}>
+          <ScrollView>
+            {filteredSchools.map((s) => (
+              <Pressable
+                key={s}
+                style={[
+                  styles.checkbox,
+                  school === s && styles.checkboxSelected,
+                ]}
+                onPress={() => {
+                  setSchool(s);
+                  setSchoolSearch(s);
+                  setShowSchoolList(false);
+                }}
+              >
+                <Text>{s}</Text>
+              </Pressable>
+            ))}
+          </ScrollView>
+        </View>
+      )}
+
+      <Text style={styles.section}>Staff Member</Text>
+      <TextInput style={styles.input} value={staffMember} onChangeText={setStaffMember} />
+
+      <Text style={styles.section}>Date</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="YYYY-MM-DD"
+        value={date}
+        onChangeText={setDate}
+      />
+
+      <Text style={styles.section}>Subject Supported</Text>
+
+      <TextInput
+        style={styles.input}
+        placeholder="Search subject..."
+        value={subjectSearch}
+        onChangeText={(text) => {
+          setSubjectSearch(text);
+          setShowSubjectList(true);
+        }}
+        onFocus={() => setShowSubjectList(true)}
+      />
+
+      {showSubjectList && (
+        <View style={[styles.pickerBox, { maxHeight: 220 }]}>
+          <ScrollView>
+            {filteredSubjects.map((s) => (
+              <Pressable
+                key={s}
+                style={[
+                  styles.checkbox,
+                  subject === s && styles.checkboxSelected,
+                ]}
+                onPress={() => {
+                  setSubject(s);
+                  setSubjectSearch(s);
+                  setShowSubjectList(false);
+                }}
+              >
+                <Text>{s}</Text>
+              </Pressable>
+            ))}
+          </ScrollView>
+        </View>
+      )}
+
+      <Text style={styles.section}>Type of Meeting</Text>
+      {meetingTypes.map((m) => (
+        <Pressable
+          key={m}
+          style={[styles.checkbox, meetingType === m && styles.checkboxSelected]}
+          onPress={() => setMeetingType(m)}
+        >
+          <Text>{m}</Text>
+        </Pressable>
+      ))}
+
+      {meetingType === 'Other' && (
+        <>
+          <Text style={styles.section}>If Other, Specify</Text>
+          <TextInput
+            style={styles.input}
+            value={otherMeetingType}
+            onChangeText={setOtherMeetingType}
+          />
+        </>
+      )}
+
+      <Text style={styles.section}>Focus of the Meeting / Workshop</Text>
+      <TextInput
+        style={styles.textArea}
+        multiline
+        value={focus}
+        onChangeText={setFocus}
+      />
+
+      <Text style={styles.section}>Number of Attendees Expected</Text>
+      <TextInput
+        style={styles.input}
+        keyboardType="numeric"
+        value={expectedAttendees}
+        onChangeText={setExpectedAttendees}
+      />
+
+      <Text style={styles.section}>Actual Number of Attendees</Text>
+      <TextInput
+        style={styles.input}
+        keyboardType="numeric"
+        value={actualAttendees}
+        onChangeText={setActualAttendees}
+      />
+
+      <Text style={styles.section}>General Comments</Text>
+      <TextInput
+        style={styles.textArea}
+        multiline
+        value={generalComments}
+        onChangeText={setGeneralComments}
+      />
+
+      <Text style={styles.section}>Schools of Concern That Were Absent</Text>
+      <TextInput
+        style={styles.textArea}
+        multiline
+        value={schoolsOfConcern}
+        onChangeText={setSchoolsOfConcern}
+      />
+
+      <Pressable style={styles.submitButton} onPress={submitGroupSupport}>
+        <Text style={styles.submitText}>Submit Group Support</Text>
+      </Pressable>
+    </ScrollView>
   );
 }
 
@@ -226,115 +700,7 @@ function SchoolVisitScreen() {
     'Follow-up',
   ];
 
-  const schools = [
-    'AFRIKAANSE HOËR MEISIESKOOL',
-    'AFRIKAANSE HOËR SEUNSKOOL',
-    'AL GHAZALI INDEPENDENT SCHOOL',
-    'AL-ASR EDUCATIONAL INSTITUTE',
-    'AMITY INTERNATIONAL',
-    'AMBERFIELD COLLEGE',
-    'BOKGONI TECHNICAL SECONDARY SCHOOL',
-    'BONA LESEDI SECONDARY SCHOOL',
-    'BOPHELONG COMMUNITY INDEPENDENT SCHOOL',
-    'CAPITAL CITY ACADEMY',
-    'CARPE DIEM ACADEMY',
-    'CENTRAL ISLAMIC SCHOOL',
-    'CENTURION SECONDARY SCHOOL',
-    'CORNERSTONE COLLEGE SEC. SCHOOL',
-    'CURRO COLLEGE PRETORIA',
-    'CURRO COLLEGE MAMELODI',
-    'DANSA INTERNATIONAL COLLEGE',
-    'DAVID HELLEN PETA SECONDARY SCHOOL',
-    'DR WF NKOMO SECONDARY SCHOOL',
-    'DUO EDU SENIORONAFHANKLIKE SKOOL',
-    'EDWARD PHATUDI SECONDARY SCHOOL',
-    'EERSTERUST SECONDARY SCHOOL',
-    'ELMAR COLLEGE',
-    'EMPRO ACADEMY',
-    'FLAVIUS MAREKA SECONDARY SCHOOL',
-    'FOUNDERS COMMUNITY SCHOOL',
-    'GATANG SECONDARY SCHOOL',
-    'GAUTENG CENTRAL COLLEGE',
-    'GLENMARK CHRISTIAN COLLEGE',
-    'GREENWOOD COLLEGE',
-    'HIMALAYA SECONDARY SCHOOL',
-    'HOËRSKOOL CENTURION',
-    'HOËRSKOOL DIE WILGERS',
-    'HOËRSKOOL ELDORAIGNE',
-    'HOËRSKOOL F H ODENDAAL',
-    'HOËRSKOOL GARSFONTEIN',
-    'HOËRSKOOL MENLOPARK',
-    'HOËRSKOOL SILVERTON',
-    'HOËRSKOOL UITSIG',
-    'HOËRSKOOL VOORTREKKERHOOGTE',
-    'HOËRSKOOL WATERKLOOF',
-    'HOËRSKOOL ZWARTKOP',
-    'HOFMEYR SECONDARY SCHOOL',
-    'HOLY TRINITY HIGH SCHOOL (CATHOLIC SEC.)',
-    'J KEKANA SECONDARY SCHOOL',
-    'JAFTA MAHLANGU SECONDARY SCHOOL',
-    'LAKEWOOD COLLEGE',
-    'LAUDIUM SECONDARY SCHOOL',
-    'LEHLABILE SECONDARY SCHOOL',
-    'LIMELIGHT ACADEMY',
-    'LOMPEC INDEPENDENT SECONDARY SCHOOL',
-    'LORETO CONVENT SCHOOL',
-    'LYTTELTON MANOR HIGH SCHOOL',
-    'MAHUBE VALLEY SECONDARY SCHOOL',
-    'MAMELODI SECONDARY SCHOOL',
-    'MBOWENI SECONDARY SCHOOL',
-    'MODIRI TECHNICAL SCHOOL',
-    'NELLMAPIUS SECONDARY SCHOOL',
-    'NUWE HOOPSKOOL',
-    'OLIEVENHOUTBOSCH SECONDARY SCHOOL',
-    'OLIEVENHOUTBOSCH SECONDARY SCHOOL NO 2',
-    'PEPPS MOTHEONG PRIMARY SCHOOL',
-    'PHATENG SECONDARY SCHOOL',
-    'PHELINDABA SECONDARY SCHOOL',
-    "PRETORIA BOYS' HIGH SCHOOL",
-    'PRETORIA CENTRAL HIGH SCHOOL',
-    'PRETORIA HIGH SCHOOL FOR GIRLS',
-    'PRETORIA INSTITUTE OF LEARNING',
-    'PRETORIA MUSLIM TRUST SUNNI SCHOOL',
-    'PRETORIA SECONDARY SCHOOL',
-    'PRETORIA TECHNICAL HIGH SCHOOL',
-    'PRINCEFIELD TRUST SCHOOL',
-    'PRINCESS PARK COLLEGE',
-    'PRO ARTE ALPHEN PARK',
-    'PROSPERITUS SECONDARY SCHOOL',
-    'QUEENS PRIVATE SCHOOL',
-    'RASLOUW ACADEMY',
-    'REPHAFOGILE SECONDARY SCHOOL',
-    'RIBANE-LAKA SECONDARY SCHOOL',
-    'RIETVLEI AKADEMIE',
-    'ROSINA SEDIBANE-MODIBA SCHOOL',
-    'SAULRIDGE SECONDARY SCHOOL',
-    'SESHEGONG SECONDARY SCHOOL',
-    'SOLOMON MAHLANGU FREEDOM SCHOOL',
-    'SONITUSSKOOL',
-    'ST AQUINAS-PRETORIA CAMPUS',
-    'STANZA BOPAPE SECONDARY SCHOOL',
-    'STAR COLLEGE PRETORIA',
-    'STEVE TSWETE SECONDARY SCHOOL',
-    'SUTHERLAND HIGH SCHOOL',
-    'THE GLEN HIGH SCHOOL',
-    'THE WAY CHRISTIAN SCHOOL',
-    'THUTO BOHLALE SECONDARY SCHOOL',
-    'TRANSORANJE SCHOOL FOR THE DEAF',
-    'TRANSVALIASKOOL-SCHOOL',
-    'TSAKO THABO SECONDARY SCHOOL',
-    'TSHWANE COLLEGE',
-    'TSHWANE MUSLIM SCHOOL',
-    'TSHWANE SECONDARY SCHOOL',
-    'TUKSSPORT HIGH SCHOOL',
-    'VERITAS ACADEMICS',
-    'VLAKFONTEIN SECONDARY SCHOOL',
-    'VUKANI MAWETHU SECONDARY SCHOOL',
-    'WATERSRAND SECONDARY SCHOOL',
-    'WIERDA INDEPENDENT SCHOOL',
-    'WILLOWRIDGE HIGH SCHOOL',
-  ];
-  const filteredSchools = schools.filter((s) =>
+  const filteredSchools = SCHOOL_LIST.filter((s) =>
     s.toLowerCase().includes(schoolSearch.toLowerCase())
   );
 
@@ -514,103 +880,6 @@ function SchoolVisitScreen() {
     advisor,
   ]);
 
-  // ========================
-  // Local Professional Refine (Section-specific)
-  // ========================
-  const localRefine = (text: string, section: string) => {
-    if (!text) return text;
-
-    let refined = text.trim();
-
-    // Normalize spacing
-    refined = refined.replace(/\s+/g, ' ').trim();
-
-    // Convert manual dashes/asterisks into bullets
-    refined = refined.replace(/^\s*[-*]\s+/gm, '• ');
-
-    // Ensure spacing after punctuation
-    refined = refined.replace(/([.!?])([A-Za-z])/g, '$1 $2');
-
-    // Capitalise sentences
-    refined = refined.replace(/(^\w|[.!?]\s+\w)/g, (c) => c.toUpperCase());
-
-    // Vocabulary upgrades
-    const replacements: Record<string, string> = {
-      kids: 'learners',
-      teachers: 'educators',
-      staff: 'educators and staff',
-      'a lot': 'numerous',
-      things: 'matters',
-      'big problem': 'significant concern',
-      'not good': 'unsatisfactory',
-      bad: 'inadequate',
-      good: 'effective',
-      okay: 'satisfactory',
-      fix: 'address',
-      help: 'support',
-      improve: 'enhance',
-      problem: 'challenge',
-    };
-
-    Object.keys(replacements).forEach((word) => {
-      const regex = new RegExp(`\\b${word}\\b`, 'gi');
-      refined = refined.replace(regex, replacements[word]);
-    });
-
-    const sentences = refined.split(/(?<=[.!?])\s+/).filter(Boolean);
-
-    // -------- INTELLIGENT SECTION AWARE FORMATTING --------
-
-    if (section === 'findings') {
-      if (sentences.length >= 3) {
-        refined = sentences
-          .map((s) => '• ' + s.trim().replace(/[.!?]$/, ''))
-          .join('\n');
-      } else {
-        refined =
-          'It was observed that ' +
-          refined.charAt(0).toLowerCase() +
-          refined.slice(1);
-      }
-    }
-
-    if (section === 'challenges') {
-      refined =
-        sentences.length >= 2
-          ? sentences.map((s) => '• ' + s.trim().replace(/[.!?]$/, '')).join('\n')
-          : 'The following challenge was identified: ' +
-            refined.charAt(0).toLowerCase() +
-            refined.slice(1);
-    }
-
-    if (section === 'recommendations') {
-      refined =
-        sentences.length >= 2
-          ? sentences.map((s) => '• ' + s.trim().replace(/[.!?]$/, '')).join('\n')
-          : 'It is recommended that ' +
-            refined.charAt(0).toLowerCase() +
-            refined.slice(1);
-    }
-
-    // Split very long blocks
-    if (refined.length > 800) {
-      const parts = refined.match(/.{1,400}(?:\s|$)/g);
-      if (parts) refined = parts.join('\n\n');
-    }
-
-    if (!/[.!?\n]$/.test(refined)) {
-      refined += '.';
-    }
-
-    return refined;
-  };
-
-  const refineText = () => {
-    setFindings(localRefine(findings, 'findings'));
-    setChallenges(localRefine(challenges, 'challenges'));
-    setRecommendations(localRefine(recommendations, 'recommendations'));
-    Alert.alert('Refined', 'Report has been refined locally.');
-  };
 
   const generatePreview = () => {
     const date = new Date().toISOString().split('T')[0];
@@ -658,10 +927,6 @@ Advisor: ${advisor.name}
     setPreviewVisible(true);
   };
 
-  const refineAndPreview = () => {
-    refineText();
-    generatePreview();
-  };
 
   const generatePdf = async () => {
     const date = new Date().toISOString().split('T')[0];
@@ -914,12 +1179,6 @@ Advisor: ${advisor.name}
         value={recommendations}
         onChangeText={setRecommendations}
       />
-      <Pressable
-        style={[styles.submitButton, { backgroundColor: '#334155', marginTop: 12 }]}
-        onPress={refineAndPreview}
-      >
-        <Text style={styles.submitText}>Refine & Preview Report</Text>
-      </Pressable>
       <Modal visible={previewVisible} animationType="slide">
         <ScrollView style={{ padding: 24 }}>
           <Text style={{ fontSize: 18, fontWeight: '700', marginBottom: 16 }}>
@@ -1247,107 +1506,6 @@ function PriorityVisitScreen() {
     'STABILISED – Routine monitoring',
   ];
 
-  // ========================
-  // Local Professional Refine (Section-specific)
-  // ========================
-  const localRefine = (text: string, section: string) => {
-    if (!text) return text;
-
-    let refined = text.trim();
-
-    // Normalize spacing
-    refined = refined.replace(/\s+/g, ' ').trim();
-
-    // Convert manual dashes/asterisks into bullets
-    refined = refined.replace(/^\s*[-*]\s+/gm, '• ');
-
-    // Ensure spacing after punctuation
-    refined = refined.replace(/([.!?])([A-Za-z])/g, '$1 $2');
-
-    // Capitalise sentences
-    refined = refined.replace(/(^\w|[.!?]\s+\w)/g, (c) => c.toUpperCase());
-
-    // Vocabulary upgrades
-    const replacements: Record<string, string> = {
-      kids: 'learners',
-      teachers: 'educators',
-      staff: 'educators and staff',
-      'a lot': 'numerous',
-      things: 'matters',
-      'big problem': 'significant concern',
-      'not good': 'unsatisfactory',
-      bad: 'inadequate',
-      good: 'effective',
-      okay: 'satisfactory',
-      fix: 'address',
-      help: 'support',
-      improve: 'enhance',
-      problem: 'challenge',
-    };
-
-    Object.keys(replacements).forEach((word) => {
-      const regex = new RegExp(`\\b${word}\\b`, 'gi');
-      refined = refined.replace(regex, replacements[word]);
-    });
-
-    const sentences = refined.split(/(?<=[.!?])\s+/).filter(Boolean);
-
-    // -------- INTELLIGENT SECTION AWARE FORMATTING --------
-
-    if (section === 'findings') {
-      if (sentences.length >= 3) {
-        refined = sentences
-          .map((s) => '• ' + s.trim().replace(/[.!?]$/, ''))
-          .join('\n');
-      } else {
-        refined =
-          'It was observed that ' +
-          refined.charAt(0).toLowerCase() +
-          refined.slice(1);
-      }
-    }
-
-    if (section === 'challenges') {
-      refined =
-        sentences.length >= 2
-          ? sentences.map((s) => '• ' + s.trim().replace(/[.!?]$/, '')).join('\n')
-          : 'The following challenge was identified: ' +
-            refined.charAt(0).toLowerCase() +
-            refined.slice(1);
-    }
-
-    if (section === 'recommendations') {
-      refined =
-        sentences.length >= 2
-          ? sentences.map((s) => '• ' + s.trim().replace(/[.!?]$/, '')).join('\n')
-          : 'It is recommended that ' +
-            refined.charAt(0).toLowerCase() +
-            refined.slice(1);
-    }
-
-    // Split very long blocks
-    if (refined.length > 800) {
-      const parts = refined.match(/.{1,400}(?:\s|$)/g);
-      if (parts) refined = parts.join('\n\n');
-    }
-
-    if (!/[.!?\n]$/.test(refined)) {
-      refined += '.';
-    }
-
-    return refined;
-  };
-
-  const refinePriorityText = () => {
-    setFindings(localRefine(findings, 'findings'));
-    setChallengesIdentified(localRefine(challengesIdentified, 'challenges'));
-    setRecommendations(localRefine(recommendations, 'recommendations'));
-    setGoodPractices(localRefine(goodPractices, 'findings'));
-    setAreasForImprovement(localRefine(areasForImprovement, 'challenges'));
-    setImprovementsFromPrevious(localRefine(improvementsFromPrevious, 'findings'));
-    setSchoolChallenges(localRefine(schoolChallenges, 'challenges'));
-    Alert.alert('Refined', 'Priority report has been refined locally.');
-  };
 
   const generatePreview = () => {
     const date = new Date().toISOString().split('T')[0];
@@ -1398,10 +1556,6 @@ ${schoolChallenges}
     setPreviewVisible(true);
   };
 
-  const refineAndPreview = () => {
-    refinePriorityText();
-    generatePreview();
-  };
 
   const cleanEmailText = (text: string) => {
     try {
@@ -1658,12 +1812,6 @@ ${schoolChallenges}
         value={schoolChallenges}
         onChangeText={setSchoolChallenges}
       />
-      <Pressable
-        style={[styles.submitButton, { backgroundColor: '#334155', marginTop: 12 }]}
-        onPress={refineAndPreview}
-      >
-        <Text style={styles.submitText}>Refine & Preview Priority Report</Text>
-      </Pressable>
       <Modal visible={previewVisible} animationType="slide">
         <ScrollView style={{ padding: 24 }}>
           <Text style={{ fontSize: 18, fontWeight: '700', marginBottom: 16 }}>
@@ -1724,6 +1872,267 @@ ${schoolChallenges}
   );
 }
 
+
+/* ---------------- DIRECT LEARNER SUPPORT SCREEN ---------------- */
+
+function DirectLearnerSupportScreen() {
+  const [startDate, setStartDate] = React.useState('');
+  const [endDate, setEndDate] = React.useState('');
+  const [staffMember, setStaffMember] = React.useState('');
+  const [subject, setSubject] = React.useState('');
+  const [subjectSearch, setSubjectSearch] = React.useState('');
+  const [showSubjectList, setShowSubjectList] = React.useState(false);
+  const [schoolSearch, setSchoolSearch] = React.useState('');
+  const [selectedSchools, setSelectedSchools] = React.useState<string[]>([]);
+  const [showSchoolList, setShowSchoolList] = React.useState(false);
+  const [supportTypes, setSupportTypes] = React.useState<string[]>([]);
+  const [otherSupport, setOtherSupport] = React.useState('');
+  const [contentOfSupport, setContentOfSupport] = React.useState('');
+  const [materialProvided, setMaterialProvided] = React.useState('');
+  const [learnersBenefitted, setLearnersBenefitted] = React.useState('');
+
+  const subjects = SUBJECT_LIST;
+
+  const filteredSubjects = subjects.filter((s) =>
+    s.toLowerCase().includes(subjectSearch.toLowerCase())
+  );
+
+  const supportList = [
+    'Teaching in school',
+    'Teach SSIP',
+    'Online Lessons',
+    'WhatsApp support',
+    'Pre & Post tests',
+    'Paired schools',
+    'Motivation of Learners',
+    'Study Skills',
+    'Other'
+  ];
+
+  const toggleSchool = (item: string) => {
+    setSelectedSchools(prev =>
+      prev.includes(item)
+        ? prev.filter(i => i !== item)
+        : [...prev, item]
+    );
+  };
+
+  const toggleSupport = (item: string) => {
+    setSupportTypes(prev =>
+      prev.includes(item)
+        ? prev.filter(i => i !== item)
+        : [...prev, item]
+    );
+  };
+
+  const filteredSchools =
+    schoolSearch.trim().length === 0
+      ? SCHOOL_LIST
+      : SCHOOL_LIST.filter((s) =>
+          s.toLowerCase().includes(schoolSearch.toLowerCase())
+        );
+
+  const submitSupport = async () => {
+    const payload = {
+      tool: "direct_learner_support",
+      startDate,
+      endDate,
+      staffMember,
+      subject,
+      schoolsInvolved: selectedSchools,
+      supportTypes,
+      otherSupport,
+      contentOfSupport,
+      materialProvided,
+      learnersBenefitted
+    };
+
+    const jsonBody = JSON.stringify(payload, null, 2);
+
+    if (Platform.OS === "web") {
+      const mailtoUrl = `mailto:martinharmse@gdets.onmicrosoft.com?subject=${encodeURIComponent(
+        "GDE_TS_DIRECT_LEARNER_SUPPORT"
+      )}&body=${encodeURIComponent(jsonBody)}`;
+      window.location.href = mailtoUrl;
+    } else {
+      await MailComposer.composeAsync({
+        recipients: ["martinharmse@gdets.onmicrosoft.com"],
+        subject: "GDE_TS_DIRECT_LEARNER_SUPPORT",
+        body: jsonBody,
+        isHtml: false,
+      });
+    }
+  };
+
+  return (
+    <ScrollView contentContainerStyle={styles.scrollContainer}>
+      <View style={styles.headerBar} />
+      <Text style={styles.screenTitle}>Direct Learner Support</Text>
+
+      <Text style={styles.section}>Start Date</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="YYYY-MM-DD"
+        value={startDate}
+        onChangeText={setStartDate}
+      />
+
+      <Text style={styles.section}>End Date</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="YYYY-MM-DD"
+        value={endDate}
+        onChangeText={setEndDate}
+      />
+
+      <Text style={styles.section}>Staff Member</Text>
+      <TextInput
+        style={styles.input}
+        value={staffMember}
+        onChangeText={setStaffMember}
+      />
+
+      <Text style={styles.section}>Subject</Text>
+
+      <TextInput
+        style={styles.input}
+        placeholder="Search subject..."
+        value={subjectSearch}
+        onChangeText={(text) => {
+          setSubjectSearch(text);
+          setShowSubjectList(true);
+        }}
+        onFocus={() => setShowSubjectList(true)}
+      />
+
+      {showSubjectList && (
+        <View style={[styles.pickerBox, { maxHeight: 220 }]}>
+          <ScrollView>
+            {filteredSubjects.map((s) => (
+              <Pressable
+                key={s}
+                style={[
+                  styles.checkbox,
+                  subject === s && styles.checkboxSelected,
+                ]}
+                onPress={() => {
+                  setSubject(s);
+                  setSubjectSearch(s);
+                  setShowSubjectList(false);
+                }}
+              >
+                <Text>{s}</Text>
+              </Pressable>
+            ))}
+          </ScrollView>
+        </View>
+      )}
+
+      <Text style={styles.section}>Schools Involved</Text>
+
+      <Pressable
+        style={[styles.input, { justifyContent: 'center' }]}
+        onPress={() => setShowSchoolList(!showSchoolList)}
+      >
+        <Text>
+          {selectedSchools.length > 0
+            ? `${selectedSchools.length} school(s) selected`
+            : 'Select schools'}
+        </Text>
+      </Pressable>
+
+      {showSchoolList && (
+        <View style={[styles.pickerBox, { maxHeight: 300 }]}>
+          <TextInput
+            style={styles.input}
+            placeholder="Search school..."
+            value={schoolSearch}
+            onChangeText={setSchoolSearch}
+          />
+
+          <ScrollView
+            keyboardShouldPersistTaps="always"
+            showsVerticalScrollIndicator={true}
+          >
+            {filteredSchools.map((s) => (
+              <Pressable
+                key={s}
+                style={[
+                  styles.checkbox,
+                  selectedSchools.includes(s) && styles.checkboxSelected,
+                ]}
+                onPress={() => toggleSchool(s)}
+              >
+                <Text>{s}</Text>
+              </Pressable>
+            ))}
+          </ScrollView>
+        </View>
+      )}
+
+      <Text style={styles.section}>Type of Learner Support</Text>
+      {supportList.map((item) => (
+        <Pressable
+          key={item}
+          style={[
+            styles.checkbox,
+            supportTypes.includes(item) && styles.checkboxSelected,
+          ]}
+          onPress={() => toggleSupport(item)}
+        >
+          <Text>{item}</Text>
+        </Pressable>
+      ))}
+
+      {supportTypes.includes('Other') && (
+        <>
+          <Text style={styles.section}>If Other, Specify</Text>
+          <TextInput
+            style={styles.textArea}
+            multiline
+            value={otherSupport}
+            onChangeText={setOtherSupport}
+          />
+        </>
+      )}
+
+      <Text style={styles.section}>Content of Support</Text>
+      <TextInput
+        style={styles.textArea}
+        multiline
+        placeholder="Describe the academic content or focus of the support provided"
+        value={contentOfSupport}
+        onChangeText={setContentOfSupport}
+      />
+
+      <Text style={styles.section}>Material Provided to Learners</Text>
+      <TextInput
+        style={styles.textArea}
+        multiline
+        placeholder="Specify worksheets, study guides, revision packs, etc."
+        value={materialProvided}
+        onChangeText={setMaterialProvided}
+      />
+
+      <Text style={styles.section}>Number of Learners Benefitted</Text>
+      <TextInput
+        style={styles.input}
+        keyboardType="numeric"
+        placeholder="Enter number of learners"
+        value={learnersBenefitted}
+        onChangeText={setLearnersBenefitted}
+      />
+
+      <Pressable
+        style={styles.submitButton}
+        onPress={submitSupport}
+      >
+        <Text style={styles.submitText}>Submit Direct Learner Support</Text>
+      </Pressable>
+    </ScrollView>
+  );
+}
+
 /* ---------------- NAVIGATION ---------------- */
 
 const Stack = createNativeStackNavigator();
@@ -1751,6 +2160,16 @@ export default function App() {
           name="PriorityVisit"
           component={PriorityVisitScreen}
           options={{ title: 'Priority School Visit' }}
+        />
+        <Stack.Screen
+          name="DirectLearnerSupport"
+          component={DirectLearnerSupportScreen}
+          options={{ title: 'Direct Learner Support' }}
+        />
+        <Stack.Screen
+          name="GroupSupport"
+          component={GroupSupportScreen}
+          options={{ title: 'Group Support' }}
         />
         <Stack.Screen
           name="Drafts"

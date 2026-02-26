@@ -1,10 +1,10 @@
+import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import * as FileSystem from 'expo-file-system/legacy';
 import * as MailComposer from 'expo-mail-composer';
 import * as Print from 'expo-print';
 import * as React from 'react';
-import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { Alert, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -303,116 +303,142 @@ function HomeScreen({ navigation }: any) {
   );
 }
 function ExaminationMonitoringScreen() {
-    const [showDatePicker, setShowDatePicker] = React.useState(false);
-  const [school, setSchool] = React.useState('');
-  const [schoolSearch, setSchoolSearch] = React.useState('');
-  const [showSchoolList, setShowSchoolList] = React.useState(false);
+// --- REPLACEMENT FUNCTION ---
 
-  const [date, setDate] = React.useState('');
+  /* ---------------- SECTION A: CENTRE DETAILS ---------------- */
 
+  const [centreName, setCentreName] = React.useState('');
+  const [district, setDistrict] = React.useState('');
+  const [centreNumber, setCentreNumber] = React.useState('');
+  const [principalName, setPrincipalName] = React.useState('');
+  const [principalContact, setPrincipalContact] = React.useState('');
+  const [chiefInvigilator, setChiefInvigilator] = React.useState('');
+  const [chiefContact, setChiefContact] = React.useState('');
   const [monitorName, setMonitorName] = React.useState('');
-  const [candidatesRegistered, setCandidatesRegistered] = React.useState('');
+  const [office, setOffice] = React.useState('');
+  const [monitorContact, setMonitorContact] = React.useState('');
+  const [date, setDate] = React.useState('');
+  const [arrivalTime, setArrivalTime] = React.useState('');
+  const [departureTime, setDepartureTime] = React.useState('');
+  const [subjects, setSubjects] = React.useState('');
+
   const [candidatesPresent, setCandidatesPresent] = React.useState('');
   const [candidatesAbsent, setCandidatesAbsent] = React.useState('');
+  const [unregistered, setUnregistered] = React.useState('');
+  const [irregularities, setIrregularities] = React.useState('');
+  const [invigilators, setInvigilators] = React.useState('');
+  const [lateCandidates, setLateCandidates] = React.useState('');
+  const [isolatedCandidates, setIsolatedCandidates] = React.useState('');
 
-  const [securityChecklist, setSecurityChecklist] = React.useState<any>({});
-  const [readinessChecklist, setReadinessChecklist] = React.useState<any>({});
-  const [pledgeChecklist, setPledgeChecklist] = React.useState<any>({});
+  /* ---------------- CHECKLIST STATE ---------------- */
 
-  const [goodPractice, setGoodPractice] = React.useState('');
-  const [areasConcern, setAreasConcern] = React.useState('');
-  const [recommendations, setRecommendations] = React.useState('');
-
-  // --- DRAFT AUTOSAVE ---
-  const MONITORING_DRAFT_KEY = 'EXAM_MONITORING_DRAFT';
-  const [lastSaved, setLastSaved] = React.useState<string | null>(null);
-
-  const saveDraft = async () => {
-    const draft = {
-      school,
-      date,
-      monitorName,
-      candidatesRegistered,
-      candidatesPresent,
-      candidatesAbsent,
-      securityChecklist,
-      readinessChecklist,
-      pledgeChecklist,
-      goodPractice,
-      areasConcern,
-      recommendations
-    };
-    await AsyncStorage.setItem(MONITORING_DRAFT_KEY, JSON.stringify(draft));
-    setLastSaved(new Date().toLocaleTimeString());
-  };
-
-  const loadDraft = async () => {
-    const saved = await AsyncStorage.getItem(MONITORING_DRAFT_KEY);
-    if (saved) {
-      const d = JSON.parse(saved);
-      setSchool(d.school || '');
-      setDate(d.date || '');
-      setMonitorName(d.monitorName || '');
-      setCandidatesRegistered(d.candidatesRegistered || '');
-      setCandidatesPresent(d.candidatesPresent || '');
-      setCandidatesAbsent(d.candidatesAbsent || '');
-      setSecurityChecklist(d.securityChecklist || {});
-      setReadinessChecklist(d.readinessChecklist || {});
-      setPledgeChecklist(d.pledgeChecklist || {});
-      setGoodPractice(d.goodPractice || '');
-      setAreasConcern(d.areasConcern || '');
-      setRecommendations(d.recommendations || '');
-    }
-  };
-
-  React.useEffect(() => {
-    loadDraft();
-  }, []);
-
-  React.useEffect(() => {
-    saveDraft();
-  }, [
-    school,
-    date,
-    monitorName,
-    candidatesRegistered,
-    candidatesPresent,
-    candidatesAbsent,
-    securityChecklist,
-    readinessChecklist,
-    pledgeChecklist,
-    goodPractice,
-    areasConcern,
-    recommendations
-  ]);
-
-  const filteredSchools =
-    schoolSearch.trim().length === 0
-      ? SCHOOL_LIST
-      : SCHOOL_LIST.filter((s) =>
-          s.toLowerCase().includes(schoolSearch.toLowerCase())
-        );
+  const [checklist, setChecklist] = React.useState<any>({});
 
   const yesNo = ['YES', 'NO'];
 
-  const toggle = (section: any, setter: any, key: string, value: string) => {
-    setter({ ...section, [key]: value });
+  const toggle = (key: string, value: string) => {
+    setChecklist((prev: any) => ({
+      ...prev,
+      [key]: value
+    }));
   };
 
+  /* ---------------- CHECKLIST ITEMS ---------------- */
+
+  const invigilatorSection = [
+    "Chief Invigilator appointed in writing (Exam Form 1)",
+    "Chief Invigilator attended official training",
+    "Proof of training of invigilators verified",
+    "Educators do not invigilate subjects they teach",
+    "Invigilators identifiable with name tags",
+    "Invigilators appointed in ratio 1:30",
+    "Invigilators sign attendance register"
+  ];
+
+  const storageSection = [
+    "Access cards / visitor register available",
+    "Timetable visible in strong room",
+    "Policy displayed in strong room",
+    "Access register signed by two officials",
+    "Duplicate keys safely stored",
+    "Double locking system in place",
+    "Storage facility emptied of old material",
+    "Answer books stored securely"
+  ];
+
+  const venueSection = [
+    "Exam file and Gazette available",
+    "Invigilation timetable available",
+    "Functional seating plan available",
+    "Subject allocation list available",
+    "Signage visible",
+    "Environment conducive",
+    "1m spacing between desks",
+    "Functional clock available"
+  ];
+
+  const beforeExamSection = [
+    "Invigilators present before start time",
+    "Candidates ID checked",
+    "Candidates scanned",
+    "Candidates seated 1 hour before",
+    "Exam Form 11 read to candidates",
+    "Plastic bags demonstrated sealed",
+    "10 minutes reading time given"
+  ];
+
+  const duringExamSection = [
+    "Chief Invigilator monitors rooms",
+    "Late-coming procedure followed",
+    "Temporary leave procedure followed",
+    "Early completion procedure followed",
+    "Irregularity procedure followed"
+  ];
+
+  const endExamSection = [
+    "Candidates remain seated during collection",
+    "Scripts counted correctly",
+    "Scripts arranged correctly",
+    "Reconciliation done",
+    "Scripts taken to storage immediately"
+  ];
+
+  /* ---------------- DEVELOPMENT + RECOMMENDATIONS ---------------- */
+
+  const [developmentAreas, setDevelopmentAreas] = React.useState('');
+  const [recommendations, setRecommendations] = React.useState('');
+
+  /* ---------------- SUBMIT ---------------- */
+
   const submitMonitoring = async () => {
+
     const payload = {
-      tool: "examination_monitoring",
-      school,
-      date,
-      monitorName,
-      candidatesRegistered,
-      candidatesPresent,
-      candidatesAbsent,
-      securityChecklist,
-      readinessChecklist,
-      pledgeChecklist,
-      goodPractice,
-      areasConcern,
+      tool: "examination_monitoring_full",
+      centreDetails: {
+        centreName,
+        district,
+        centreNumber,
+        principalName,
+        principalContact,
+        chiefInvigilator,
+        chiefContact,
+        monitorName,
+        office,
+        monitorContact,
+        date,
+        arrivalTime,
+        departureTime,
+        subjects,
+        candidatesPresent,
+        candidatesAbsent,
+        unregistered,
+        irregularities,
+        invigilators,
+        lateCandidates,
+        isolatedCandidates
+      },
+      checklist,
+      developmentAreas,
       recommendations
     };
 
@@ -420,200 +446,87 @@ function ExaminationMonitoringScreen() {
 
     if (Platform.OS === "web") {
       const mailtoUrl = `mailto:martinharmse@gdets.onmicrosoft.com?subject=${encodeURIComponent(
-        "GDE_TS_EXAM_MONITORING"
+        "GDE_TS_EXAM_MONITORING_FULL"
       )}&body=${encodeURIComponent(jsonBody)}`;
       window.location.href = mailtoUrl;
     } else {
       await MailComposer.composeAsync({
         recipients: ["martinharmse@gdets.onmicrosoft.com"],
-        subject: "GDE_TS_EXAM_MONITORING",
+        subject: "GDE_TS_EXAM_MONITORING_FULL",
         body: jsonBody,
         isHtml: false,
       });
     }
   };
 
-  const securityItems = [
-    'Access cards / visitors register available',
-    'Strong room double locking',
-    'Timetable visible in strong room',
-    'Policy displayed in strong room',
-    'Access register with two signatures',
-    'Duplicate keys safely stored'
-  ];
-
-  const readinessItems = [
-    'Signage visible',
-    'Chief Invigilator appointment signed',
-    'Invigilators appointment signed',
-    'Workstation provided',
-    'Exam room conducive',
-    'Time frames displayed',
-    'Exam file available',
-    'Form 35 signed',
-    'Invigilation timetable available',
-    'Form 11a available',
-    'Seating plans available',
-    'Functional clocks available',
-    'Emergency drill conducted',
-    'Ablution facilities suitable'
-  ];
-
-  const pledgeItems = [
-    'All candidates properly registered',
-    'All candidates present',
-    'Form 11 read',
-    'Video played',
-    'Pledge read aloud',
-    'Commitment explained before signing',
-    'All signed voluntarily',
-    'Copies retained',
-    'Learners aware of misconduct rules',
-    'All candidates have IDs',
-    'School has required resources',
-    'School ready for NSC Exams'
-  ];
-
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
       <View style={styles.headerBar} />
-      <Text style={styles.screenTitle}>Examination Monitoring</Text>
+      <Text style={styles.screenTitle}>Examination Monitoring (Full Instrument)</Text>
 
-      <Text style={styles.section}>School</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Search school..."
-        value={schoolSearch}
-        onChangeText={(text) => {
-          setSchoolSearch(text);
-          setShowSchoolList(true);
-        }}
-        onFocus={() => setShowSchoolList(true)}
-      />
+      <Text style={styles.section}>A. Examination Centre & Monitor Details</Text>
 
-      {showSchoolList && (
-        <View style={[styles.pickerBox, { maxHeight: 220 }]}>
-          <ScrollView>
-            {filteredSchools.map((s) => (
-              <Pressable
-                key={s}
-                style={[
-                  styles.checkbox,
-                  school === s && styles.checkboxSelected,
-                ]}
-                onPress={() => {
-                  setSchool(s);
-                  setSchoolSearch(s);
-                  setShowSchoolList(false);
-                }}
-              >
-                <Text>{s}</Text>
-              </Pressable>
-            ))}
-          </ScrollView>
-        </View>
-      )}
+      <TextInput style={styles.input} placeholder="Centre Name" value={centreName} onChangeText={setCentreName} />
+      <TextInput style={styles.input} placeholder="District" value={district} onChangeText={setDistrict} />
+      <TextInput style={styles.input} placeholder="Centre Number" value={centreNumber} onChangeText={setCentreNumber} />
+      <TextInput style={styles.input} placeholder="Principal Name" value={principalName} onChangeText={setPrincipalName} />
+      <TextInput style={styles.input} placeholder="Principal Contact" value={principalContact} onChangeText={setPrincipalContact} />
+      <TextInput style={styles.input} placeholder="Chief Invigilator Name" value={chiefInvigilator} onChangeText={setChiefInvigilator} />
+      <TextInput style={styles.input} placeholder="Chief Invigilator Contact" value={chiefContact} onChangeText={setChiefContact} />
+      <TextInput style={styles.input} placeholder="Monitor Name" value={monitorName} onChangeText={setMonitorName} />
+      <TextInput style={styles.input} placeholder="Office" value={office} onChangeText={setOffice} />
+      <TextInput style={styles.input} placeholder="Monitor Contact" value={monitorContact} onChangeText={setMonitorContact} />
+      <TextInput style={styles.input} placeholder="Date (YYYY-MM-DD)" value={date} onChangeText={setDate} />
+      <TextInput style={styles.input} placeholder="Time of Arrival" value={arrivalTime} onChangeText={setArrivalTime} />
+      <TextInput style={styles.input} placeholder="Time of Departure" value={departureTime} onChangeText={setDepartureTime} />
+      <TextInput style={styles.input} placeholder="Subject(s)" value={subjects} onChangeText={setSubjects} />
 
-      <Text style={styles.section}>Date</Text>
-      <Pressable style={styles.input} onPress={() => setShowDatePicker(true)}>
-        <Text>{date ? date : 'Select date'}</Text>
-      </Pressable>
-      {showDatePicker && (
-        <DateTimePicker
-          value={date ? new Date(date) : new Date()}
-          mode="date"
-          display="default"
-          onChange={(event: DateTimePickerEvent, selectedDate?: Date) => {
-            setShowDatePicker(false);
-            if (selectedDate) {
-              setDate(selectedDate.toISOString().split('T')[0]);
-            }
-          }}
-        />
-      )}
+      <TextInput style={styles.input} placeholder="Candidates Present" keyboardType="numeric" value={candidatesPresent} onChangeText={setCandidatesPresent} />
+      <TextInput style={styles.input} placeholder="Candidates Absent" keyboardType="numeric" value={candidatesAbsent} onChangeText={setCandidatesAbsent} />
+      <TextInput style={styles.input} placeholder="Unregistered Candidates" keyboardType="numeric" value={unregistered} onChangeText={setUnregistered} />
+      <TextInput style={styles.input} placeholder="Irregularities" keyboardType="numeric" value={irregularities} onChangeText={setIrregularities} />
+      <TextInput style={styles.input} placeholder="Number of Invigilators" keyboardType="numeric" value={invigilators} onChangeText={setInvigilators} />
+      <TextInput style={styles.input} placeholder="Late Candidates" keyboardType="numeric" value={lateCandidates} onChangeText={setLateCandidates} />
+      <TextInput style={styles.input} placeholder="Candidates in Isolation" keyboardType="numeric" value={isolatedCandidates} onChangeText={setIsolatedCandidates} />
 
-      <Text style={styles.section}>Monitor Name</Text>
-      <TextInput style={styles.input} value={monitorName} onChangeText={setMonitorName} />
-
-      <Text style={styles.section}>Number of Candidates</Text>
-      <TextInput style={styles.input} placeholder="Registered" keyboardType="numeric" value={candidatesRegistered} onChangeText={setCandidatesRegistered} />
-      <TextInput style={styles.input} placeholder="Present" keyboardType="numeric" value={candidatesPresent} onChangeText={setCandidatesPresent} />
-      <TextInput style={styles.input} placeholder="Absent" keyboardType="numeric" value={candidatesAbsent} onChangeText={setCandidatesAbsent} />
-
-      <Text style={styles.section}>Security & Storage Checklist</Text>
-      {securityItems.map((item) => (
-        <View key={item}>
-          <Text>{item}</Text>
-          {yesNo.map((option) => (
-            <Pressable
-              key={option}
-              style={[
-                styles.checkbox,
-                securityChecklist[item] === option && styles.checkboxSelected
-              ]}
-              onPress={() => toggle(securityChecklist, setSecurityChecklist, item, option)}
-            >
-              <Text>{option}</Text>
-            </Pressable>
+      {[ 
+        { title: "Invigilators & Administration", items: invigilatorSection },
+        { title: "Storage Facilities & Security", items: storageSection },
+        { title: "Examination Venue", items: venueSection },
+        { title: "Before Commencement", items: beforeExamSection },
+        { title: "During Examination", items: duringExamSection },
+        { title: "End of Examination", items: endExamSection }
+      ].map((section) => (
+        <View key={section.title}>
+          <Text style={styles.section}>{section.title}</Text>
+          {section.items.map((item) => (
+            <View key={item}>
+              <Text>{item}</Text>
+              {yesNo.map((option) => (
+                <Pressable
+                  key={option}
+                  style={[
+                    styles.checkbox,
+                    checklist[item] === option && styles.checkboxSelected
+                  ]}
+                  onPress={() => toggle(item, option)}
+                >
+                  <Text>{option}</Text>
+                </Pressable>
+              ))}
+            </View>
           ))}
         </View>
       ))}
 
-      <Text style={styles.section}>Centre Readiness Checklist</Text>
-      {readinessItems.map((item) => (
-        <View key={item}>
-          <Text>{item}</Text>
-          {yesNo.map((option) => (
-            <Pressable
-              key={option}
-              style={[
-                styles.checkbox,
-                readinessChecklist[item] === option && styles.checkboxSelected
-              ]}
-              onPress={() => toggle(readinessChecklist, setReadinessChecklist, item, option)}
-            >
-              <Text>{option}</Text>
-            </Pressable>
-          ))}
-        </View>
-      ))}
-
-      <Text style={styles.section}>Commitment / Pledge Monitoring</Text>
-      {pledgeItems.map((item) => (
-        <View key={item}>
-          <Text>{item}</Text>
-          {yesNo.map((option) => (
-            <Pressable
-              key={option}
-              style={[
-                styles.checkbox,
-                pledgeChecklist[item] === option && styles.checkboxSelected
-              ]}
-              onPress={() => toggle(pledgeChecklist, setPledgeChecklist, item, option)}
-            >
-              <Text>{option}</Text>
-            </Pressable>
-          ))}
-        </View>
-      ))}
-
-      <Text style={styles.section}>Areas of Good Practice</Text>
-      <TextInput style={styles.textArea} multiline value={goodPractice} onChangeText={setGoodPractice} />
-
-      <Text style={styles.section}>Areas of Concern</Text>
-      <TextInput style={styles.textArea} multiline value={areasConcern} onChangeText={setAreasConcern} />
+      <Text style={styles.section}>Areas that Need Development</Text>
+      <TextInput style={styles.textArea} multiline value={developmentAreas} onChangeText={setDevelopmentAreas} />
 
       <Text style={styles.section}>Recommendations</Text>
       <TextInput style={styles.textArea} multiline value={recommendations} onChangeText={setRecommendations} />
 
-      {lastSaved && (
-        <Text style={{ marginTop: 8, color: '#475569', fontSize: 12 }}>
-          Draft auto-saved at {lastSaved}
-        </Text>
-      )}
-
       <Pressable style={styles.submitButton} onPress={submitMonitoring}>
-        <Text style={styles.submitText}>Submit Examination Monitoring</Text>
+        <Text style={styles.submitText}>Submit Full Examination Monitoring</Text>
       </Pressable>
     </ScrollView>
   );
@@ -821,17 +734,40 @@ function GroupSupportScreen() {
         <Text>{date ? date : 'Select date'}</Text>
       </Pressable>
       {showDatePicker && (
-        <DateTimePicker
-          value={date ? new Date(date) : new Date()}
-          mode="date"
-          display="default"
-          onChange={(event: DateTimePickerEvent, selectedDate?: Date) => {
-            setShowDatePicker(false);
-            if (selectedDate) {
-              setDate(selectedDate.toISOString().split('T')[0]);
-            }
-          }}
-        />
+        Platform.OS === 'android' ? (
+          <DateTimePicker
+            value={date ? new Date(date) : new Date()}
+            mode="date"
+            display="default"
+            onChange={(event: DateTimePickerEvent, selectedDate?: Date) => {
+              setShowDatePicker(false);
+              if (selectedDate) {
+                setDate(selectedDate.toISOString().split('T')[0]);
+              }
+            }}
+          />
+        ) : (
+          <Modal transparent={true} visible={showDatePicker} animationType="slide">
+            <View style={{ flex: 1, justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.3)' }}>
+              <View style={{ backgroundColor: 'white', margin: 24, borderRadius: 8, padding: 16 }}>
+                <DateTimePicker
+                  value={date ? new Date(date) : new Date()}
+                  mode="date"
+                  display="spinner"
+                  onChange={(event: DateTimePickerEvent, selectedDate?: Date) => {
+                    if (event.type === 'set' && selectedDate) {
+                      setDate(selectedDate.toISOString().split('T')[0]);
+                    }
+                    setShowDatePicker(false);
+                  }}
+                />
+                <Pressable onPress={() => setShowDatePicker(false)} style={{ marginTop: 8, alignItems: 'center' }}>
+                  <Text style={{ color: '#007AFF', fontWeight: 'bold' }}>Done</Text>
+                </Pressable>
+              </View>
+            </View>
+          </Modal>
+        )
       )}
 
       <Text style={styles.section}>Subject Supported</Text>
@@ -2538,17 +2474,40 @@ function DirectLearnerSupportScreen() {
         <Text>{startDate ? startDate : 'Select start date'}</Text>
       </Pressable>
       {showStartDatePicker && (
-        <DateTimePicker
-          value={startDate ? new Date(startDate) : new Date()}
-          mode="date"
-          display="default"
-          onChange={(event: DateTimePickerEvent, selectedDate?: Date) => {
-            setShowStartDatePicker(false);
-            if (selectedDate) {
-              setStartDate(selectedDate.toISOString().split('T')[0]);
-            }
-          }}
-        />
+        Platform.OS === 'android' ? (
+          <DateTimePicker
+            value={startDate ? new Date(startDate) : new Date()}
+            mode="date"
+            display="default"
+            onChange={(event: DateTimePickerEvent, selectedDate?: Date) => {
+              setShowStartDatePicker(false);
+              if (selectedDate) {
+                setStartDate(selectedDate.toISOString().split('T')[0]);
+              }
+            }}
+          />
+        ) : (
+          <Modal transparent={true} visible={showStartDatePicker} animationType="slide">
+            <View style={{ flex: 1, justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.3)' }}>
+              <View style={{ backgroundColor: 'white', margin: 24, borderRadius: 8, padding: 16 }}>
+                <DateTimePicker
+                  value={startDate ? new Date(startDate) : new Date()}
+                  mode="date"
+                  display="spinner"
+                  onChange={(event: DateTimePickerEvent, selectedDate?: Date) => {
+                    if (event.type === 'set' && selectedDate) {
+                      setStartDate(selectedDate.toISOString().split('T')[0]);
+                    }
+                    setShowStartDatePicker(false);
+                  }}
+                />
+                <Pressable onPress={() => setShowStartDatePicker(false)} style={{ marginTop: 8, alignItems: 'center' }}>
+                  <Text style={{ color: '#007AFF', fontWeight: 'bold' }}>Done</Text>
+                </Pressable>
+              </View>
+            </View>
+          </Modal>
+        )
       )}
 
       <Text style={styles.section}>End Date</Text>
@@ -2556,17 +2515,40 @@ function DirectLearnerSupportScreen() {
         <Text>{endDate ? endDate : 'Select end date'}</Text>
       </Pressable>
       {showEndDatePicker && (
-        <DateTimePicker
-          value={endDate ? new Date(endDate) : new Date()}
-          mode="date"
-          display="default"
-          onChange={(event: DateTimePickerEvent, selectedDate?: Date) => {
-            setShowEndDatePicker(false);
-            if (selectedDate) {
-              setEndDate(selectedDate.toISOString().split('T')[0]);
-            }
-          }}
-        />
+        Platform.OS === 'android' ? (
+          <DateTimePicker
+            value={endDate ? new Date(endDate) : new Date()}
+            mode="date"
+            display="default"
+            onChange={(event: DateTimePickerEvent, selectedDate?: Date) => {
+              setShowEndDatePicker(false);
+              if (selectedDate) {
+                setEndDate(selectedDate.toISOString().split('T')[0]);
+              }
+            }}
+          />
+        ) : (
+          <Modal transparent={true} visible={showEndDatePicker} animationType="slide">
+            <View style={{ flex: 1, justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.3)' }}>
+              <View style={{ backgroundColor: 'white', margin: 24, borderRadius: 8, padding: 16 }}>
+                <DateTimePicker
+                  value={endDate ? new Date(endDate) : new Date()}
+                  mode="date"
+                  display="spinner"
+                  onChange={(event: DateTimePickerEvent, selectedDate?: Date) => {
+                    if (event.type === 'set' && selectedDate) {
+                      setEndDate(selectedDate.toISOString().split('T')[0]);
+                    }
+                    setShowEndDatePicker(false);
+                  }}
+                />
+                <Pressable onPress={() => setShowEndDatePicker(false)} style={{ marginTop: 8, alignItems: 'center' }}>
+                  <Text style={{ color: '#007AFF', fontWeight: 'bold' }}>Done</Text>
+                </Pressable>
+              </View>
+            </View>
+          </Modal>
+        )
       )}
 
       <Text style={styles.section}>Staff Member</Text>
@@ -2785,13 +2767,16 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 24,
     justifyContent: 'center',
-    backgroundColor: '#0b3d6d', 
+    backgroundColor: '#0b3d6d',
+    minHeight: '100%',
   },
 
   scrollContainer: {
+    flexGrow: 1,
+    minHeight: '100%',
     padding: 24,
     paddingBottom: 80,
-    backgroundColor: '#f4f8fc',
+    backgroundColor: '#0b3d6d',
   },
 
   /* ---------- HEADER & TITLES ---------- */
@@ -2822,7 +2807,7 @@ const styles = StyleSheet.create({
   /* ---------- CARDS ---------- */
 
   card: {
-    backgroundColor: '#ffffff',
+    backgroundColor: '#13294b',
     padding: 22,
     borderRadius: 14,
     marginBottom: 20,
@@ -2886,24 +2871,24 @@ const styles = StyleSheet.create({
 
   input: {
     borderWidth: 1,
-    borderColor: '#cbd5e1',
+    borderColor: '#ffcc00',
     borderRadius: 10,
     padding: 10,
     marginTop: 8,
-    backgroundColor: '#ffffff',
-    color: '#0f172a',
+    backgroundColor: '#13294b',
+    color: '#ffcc00',
   },
 
   textArea: {
     borderWidth: 1,
-    borderColor: '#cbd5e1',
+    borderColor: '#ffcc00',
     borderRadius: 12,
     padding: 12,
     marginTop: 10,
     minHeight: 100,
     textAlignVertical: 'top',
-    backgroundColor: '#ffffff',
-    color: '#0f172a',
+    backgroundColor: '#13294b',
+    color: '#ffcc00',
   },
 
   /* ---------- CHECKBOXES ---------- */
@@ -2994,10 +2979,12 @@ const styles = StyleSheet.create({
   },
 
   headerBar: {
-    height: 6,
+    height: 12,
     backgroundColor: '#ffcc00',
-    marginBottom: 20,
-    borderRadius: 3,
+    marginBottom: 24,
+    borderRadius: 6,
+    width: '100%',
+    alignSelf: 'center',
   },
 
   statusRed: {

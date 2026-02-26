@@ -235,70 +235,67 @@ const SUBJECT_LIST = [
 function HomeScreen({ navigation }: any) {
   return (
     <View style={{ flex: 1, backgroundColor: '#0b3d6d' }}>
-      <ScrollView contentContainerStyle={[styles.homeContainer, { flexGrow: 1, minHeight: '100%' }]}
-        style={{ flex: 1 }}>
+      <ScrollView contentContainerStyle={[styles.homeContainer, { flexGrow: 1, minHeight: '100%' }]} style={{ flex: 1 }}>
         <View style={styles.headerBar} />
-
         <Text style={styles.title}>Gauteng Department of Education</Text>
         <Text style={styles.bigSubtitle}>Subject Advisor Reporting Tools</Text>
         <View style={styles.thickYellowLine} />
 
-        {/* ...existing code... */}
+        <Pressable
+          style={[styles.card, styles.priority]}
+          onPress={() => navigation.navigate('PriorityVisit')}
+        >
+          <Text style={styles.cardTitle}>Priority School Visit</Text>
+          <Text style={styles.cardText}>
+            Targeted intervention for priority schools
+          </Text>
+        </Pressable>
 
-      <Pressable
-        style={[styles.card, styles.priority]}
-        onPress={() => navigation.navigate('PriorityVisit')}
-      >
-        <Text style={styles.cardTitle}>Priority School Visit</Text>
-        <Text style={styles.cardText}>
-          Targeted intervention for priority schools
-        </Text>
-      </Pressable>
+        <Pressable
+          style={[styles.card, { backgroundColor: '#e6f4ff', borderColor: '#0b3d6d' }]}
+          onPress={() => navigation.navigate('DirectLearnerSupport')}
+        >
+          <Text style={styles.cardTitle}>Direct Learner Support</Text>
+          <Text style={styles.cardText}>
+            Track structured learner support interventions
+          </Text>
+        </Pressable>
 
-      <Pressable
-        style={[styles.card, { backgroundColor: '#e6f4ff', borderColor: '#0b3d6d' }]}
-        onPress={() => navigation.navigate('DirectLearnerSupport')}
-      >
-        <Text style={styles.cardTitle}>Direct Learner Support</Text>
-        <Text style={styles.cardText}>
-          Track structured learner support interventions
-        </Text>
-      </Pressable>
+        <Pressable
+          style={[styles.card, { backgroundColor: '#eef2ff', borderColor: '#0b3d6d' }]}
+          onPress={() => navigation.navigate('GroupSupport')}
+        >
+          <Text style={styles.cardTitle}>Group Support</Text>
+          <Text style={styles.cardText}>
+            Record cluster, PLC and structured group support meetings
+          </Text>
+        </Pressable>
 
-      <Pressable
-        style={[styles.card, { backgroundColor: '#eef2ff', borderColor: '#0b3d6d' }]}
-        onPress={() => navigation.navigate('GroupSupport')}
-      >
-        <Text style={styles.cardTitle}>Group Support</Text>
-        <Text style={styles.cardText}>
-          Record cluster, PLC and structured group support meetings
-        </Text>
-      </Pressable>
+        <Pressable
+          style={[styles.card, { backgroundColor: '#fef3c7', borderColor: '#0b3d6d' }]}
+          onPress={() => navigation.navigate('ExaminationMonitoring')}
+        >
+          <Text style={styles.cardTitle}>Examination Monitoring</Text>
+          <Text style={styles.cardText}>
+            NSC Examination Centre Readiness & Commitment Monitoring
+          </Text>
+        </Pressable>
 
-      <Pressable
-        style={[styles.card, { backgroundColor: '#fef3c7', borderColor: '#0b3d6d' }]}
-        onPress={() => navigation.navigate('ExaminationMonitoring')}
-      >
-        <Text style={styles.cardTitle}>Examination Monitoring</Text>
-        <Text style={styles.cardText}>
-          NSC Examination Centre Readiness & Commitment Monitoring
-        </Text>
-      </Pressable>
-
-      <Pressable
-        style={[styles.card, { backgroundColor: '#e2e8f0', borderColor: '#0b3d6d' }]}
-        onPress={() => navigation.navigate('Drafts')}
-      >
-        <Text style={styles.cardTitle}>Saved Drafts</Text>
-        <Text style={styles.cardText}>
-          View and open locally saved drafts
-        </Text>
-      </Pressable>
-    </ScrollView>
+        <Pressable
+          style={[styles.card, { backgroundColor: '#e2e8f0', borderColor: '#0b3d6d' }]}
+          onPress={() => navigation.navigate('Drafts')}
+        >
+          <Text style={styles.cardTitle}>Saved Drafts</Text>
+          <Text style={styles.cardText}>
+            View and open locally saved drafts
+          </Text>
+        </Pressable>
+      </ScrollView>
+    </View>
   );
 }
+
 function ExaminationMonitoringScreen() {
-// --- REPLACEMENT FUNCTION ---
 
   /* ---------------- SECTION A: CENTRE DETAILS ---------------- */
 

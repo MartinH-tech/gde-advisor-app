@@ -2342,12 +2342,17 @@ const styles = StyleSheet.create({
   /* ---------- INPUTS ---------- */
 
   pickerBox: {
+    position: 'absolute',
+    zIndex: 1000,
+    elevation: 10,
+    left: 0,
+    right: 0,
+    marginTop: 4,
     borderWidth: 1,
     borderColor: '#cbd5e1',
     borderRadius: 10,
-    marginTop: 8,
     backgroundColor: '#ffffff',
-    overflow: 'hidden',
+    maxHeight: 280,
   },
 
   input: {

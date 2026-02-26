@@ -291,8 +291,335 @@ function HomeScreen({ navigation }: any) {
           View and open locally saved drafts
         </Text>
       </Pressable>
-      </View>
-    );
+
+      <Pressable
+        style={[styles.card, { backgroundColor: '#fef3c7', borderColor: '#0b3d6d' }]}
+        onPress={() => navigation.navigate('ExaminationMonitoring')}
+      >
+        <Text style={styles.cardTitle}>Examination Monitoring</Text>
+        <Text style={styles.cardText}>
+          NSC Examination Centre Readiness & Commitment Monitoring
+        </Text>
+      </Pressable>
+    </View>
+  );
+}
+function ExaminationMonitoringScreen() {
+  const [school, setSchool] = React.useState('');
+  const [schoolSearch, setSchoolSearch] = React.useState('');
+  const [showSchoolList, setShowSchoolList] = React.useState(false);
+
+  const [date, setDate] = React.useState('');
+  const [showDatePicker, setShowDatePicker] = React.useState(false);
+
+  const [monitorName, setMonitorName] = React.useState('');
+  const [candidatesRegistered, setCandidatesRegistered] = React.useState('');
+  const [candidatesPresent, setCandidatesPresent] = React.useState('');
+  const [candidatesAbsent, setCandidatesAbsent] = React.useState('');
+
+  const [securityChecklist, setSecurityChecklist] = React.useState<any>({});
+  const [readinessChecklist, setReadinessChecklist] = React.useState<any>({});
+  const [pledgeChecklist, setPledgeChecklist] = React.useState<any>({});
+
+  const [goodPractice, setGoodPractice] = React.useState('');
+  const [areasConcern, setAreasConcern] = React.useState('');
+  const [recommendations, setRecommendations] = React.useState('');
+
+  // --- DRAFT AUTOSAVE ---
+  const MONITORING_DRAFT_KEY = 'EXAM_MONITORING_DRAFT';
+  const [lastSaved, setLastSaved] = React.useState<string | null>(null);
+
+  const saveDraft = async () => {
+    const draft = {
+      school,
+      date,
+      monitorName,
+      candidatesRegistered,
+      candidatesPresent,
+      candidatesAbsent,
+      securityChecklist,
+      readinessChecklist,
+      pledgeChecklist,
+      goodPractice,
+      areasConcern,
+      recommendations
+    };
+    await AsyncStorage.setItem(MONITORING_DRAFT_KEY, JSON.stringify(draft));
+    setLastSaved(new Date().toLocaleTimeString());
+  };
+
+  const loadDraft = async () => {
+    const saved = await AsyncStorage.getItem(MONITORING_DRAFT_KEY);
+    if (saved) {
+      const d = JSON.parse(saved);
+      setSchool(d.school || '');
+      setDate(d.date || '');
+      setMonitorName(d.monitorName || '');
+      setCandidatesRegistered(d.candidatesRegistered || '');
+      setCandidatesPresent(d.candidatesPresent || '');
+      setCandidatesAbsent(d.candidatesAbsent || '');
+      setSecurityChecklist(d.securityChecklist || {});
+      setReadinessChecklist(d.readinessChecklist || {});
+      setPledgeChecklist(d.pledgeChecklist || {});
+      setGoodPractice(d.goodPractice || '');
+      setAreasConcern(d.areasConcern || '');
+      setRecommendations(d.recommendations || '');
+    }
+  };
+
+  React.useEffect(() => {
+    loadDraft();
+  }, []);
+
+  React.useEffect(() => {
+    saveDraft();
+  }, [
+    school,
+    date,
+    monitorName,
+    candidatesRegistered,
+    candidatesPresent,
+    candidatesAbsent,
+    securityChecklist,
+    readinessChecklist,
+    pledgeChecklist,
+    goodPractice,
+    areasConcern,
+    recommendations
+  ]);
+
+  const filteredSchools =
+    schoolSearch.trim().length === 0
+      ? SCHOOL_LIST
+      : SCHOOL_LIST.filter((s) =>
+          s.toLowerCase().includes(schoolSearch.toLowerCase())
+        );
+
+  const yesNo = ['YES', 'NO'];
+
+  const toggle = (section: any, setter: any, key: string, value: string) => {
+    setter({ ...section, [key]: value });
+  };
+
+  const submitMonitoring = async () => {
+    const payload = {
+      tool: "examination_monitoring",
+      school,
+      date,
+      monitorName,
+      candidatesRegistered,
+      candidatesPresent,
+      candidatesAbsent,
+      securityChecklist,
+      readinessChecklist,
+      pledgeChecklist,
+      goodPractice,
+      areasConcern,
+      recommendations
+    };
+
+    const jsonBody = JSON.stringify(payload, null, 2);
+
+    if (Platform.OS === "web") {
+      const mailtoUrl = `mailto:martinharmse@gdets.onmicrosoft.com?subject=${encodeURIComponent(
+        "GDE_TS_EXAM_MONITORING"
+      )}&body=${encodeURIComponent(jsonBody)}`;
+      window.location.href = mailtoUrl;
+    } else {
+      await MailComposer.composeAsync({
+        recipients: ["martinharmse@gdets.onmicrosoft.com"],
+        subject: "GDE_TS_EXAM_MONITORING",
+        body: jsonBody,
+        isHtml: false,
+      });
+    }
+  };
+
+  const securityItems = [
+    'Access cards / visitors register available',
+    'Strong room double locking',
+    'Timetable visible in strong room',
+    'Policy displayed in strong room',
+    'Access register with two signatures',
+    'Duplicate keys safely stored'
+  ];
+
+  const readinessItems = [
+    'Signage visible',
+    'Chief Invigilator appointment signed',
+    'Invigilators appointment signed',
+    'Workstation provided',
+    'Exam room conducive',
+    'Time frames displayed',
+    'Exam file available',
+    'Form 35 signed',
+    'Invigilation timetable available',
+    'Form 11a available',
+    'Seating plans available',
+    'Functional clocks available',
+    'Emergency drill conducted',
+    'Ablution facilities suitable'
+  ];
+
+  const pledgeItems = [
+    'All candidates properly registered',
+    'All candidates present',
+    'Form 11 read',
+    'Video played',
+    'Pledge read aloud',
+    'Commitment explained before signing',
+    'All signed voluntarily',
+    'Copies retained',
+    'Learners aware of misconduct rules',
+    'All candidates have IDs',
+    'School has required resources',
+    'School ready for NSC Exams'
+  ];
+
+  return (
+    <ScrollView contentContainerStyle={styles.scrollContainer}>
+      <View style={styles.headerBar} />
+      <Text style={styles.screenTitle}>Examination Monitoring</Text>
+
+      <Text style={styles.section}>School</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Search school..."
+        value={schoolSearch}
+        onChangeText={(text) => {
+          setSchoolSearch(text);
+          setShowSchoolList(true);
+        }}
+        onFocus={() => setShowSchoolList(true)}
+      />
+
+      {showSchoolList && (
+        <View style={[styles.pickerBox, { maxHeight: 220 }]}>
+          <ScrollView>
+            {filteredSchools.map((s) => (
+              <Pressable
+                key={s}
+                style={[
+                  styles.checkbox,
+                  school === s && styles.checkboxSelected,
+                ]}
+                onPress={() => {
+                  setSchool(s);
+                  setSchoolSearch(s);
+                  setShowSchoolList(false);
+                }}
+              >
+                <Text>{s}</Text>
+              </Pressable>
+            ))}
+          </ScrollView>
+        </View>
+      )}
+
+      <Text style={styles.section}>Date</Text>
+      <Pressable style={styles.input} onPress={() => setShowDatePicker(true)}>
+        <Text>{date || 'Select date'}</Text>
+      </Pressable>
+
+      {showDatePicker && (
+        <DateTimePicker
+          value={date ? new Date(date) : new Date()}
+          mode="date"
+          display="default"
+          onChange={(event, selectedDate) => {
+            setShowDatePicker(false);
+            if (selectedDate) {
+              setDate(selectedDate.toISOString().split('T')[0]);
+            }
+          }}
+        />
+      )}
+
+      <Text style={styles.section}>Monitor Name</Text>
+      <TextInput style={styles.input} value={monitorName} onChangeText={setMonitorName} />
+
+      <Text style={styles.section}>Number of Candidates</Text>
+      <TextInput style={styles.input} placeholder="Registered" keyboardType="numeric" value={candidatesRegistered} onChangeText={setCandidatesRegistered} />
+      <TextInput style={styles.input} placeholder="Present" keyboardType="numeric" value={candidatesPresent} onChangeText={setCandidatesPresent} />
+      <TextInput style={styles.input} placeholder="Absent" keyboardType="numeric" value={candidatesAbsent} onChangeText={setCandidatesAbsent} />
+
+      <Text style={styles.section}>Security & Storage Checklist</Text>
+      {securityItems.map((item) => (
+        <View key={item}>
+          <Text>{item}</Text>
+          {yesNo.map((option) => (
+            <Pressable
+              key={option}
+              style={[
+                styles.checkbox,
+                securityChecklist[item] === option && styles.checkboxSelected
+              ]}
+              onPress={() => toggle(securityChecklist, setSecurityChecklist, item, option)}
+            >
+              <Text>{option}</Text>
+            </Pressable>
+          ))}
+        </View>
+      ))}
+
+      <Text style={styles.section}>Centre Readiness Checklist</Text>
+      {readinessItems.map((item) => (
+        <View key={item}>
+          <Text>{item}</Text>
+          {yesNo.map((option) => (
+            <Pressable
+              key={option}
+              style={[
+                styles.checkbox,
+                readinessChecklist[item] === option && styles.checkboxSelected
+              ]}
+              onPress={() => toggle(readinessChecklist, setReadinessChecklist, item, option)}
+            >
+              <Text>{option}</Text>
+            </Pressable>
+          ))}
+        </View>
+      ))}
+
+      <Text style={styles.section}>Commitment / Pledge Monitoring</Text>
+      {pledgeItems.map((item) => (
+        <View key={item}>
+          <Text>{item}</Text>
+          {yesNo.map((option) => (
+            <Pressable
+              key={option}
+              style={[
+                styles.checkbox,
+                pledgeChecklist[item] === option && styles.checkboxSelected
+              ]}
+              onPress={() => toggle(pledgeChecklist, setPledgeChecklist, item, option)}
+            >
+              <Text>{option}</Text>
+            </Pressable>
+          ))}
+        </View>
+      ))}
+
+      <Text style={styles.section}>Areas of Good Practice</Text>
+      <TextInput style={styles.textArea} multiline value={goodPractice} onChangeText={setGoodPractice} />
+
+      <Text style={styles.section}>Areas of Concern</Text>
+      <TextInput style={styles.textArea} multiline value={areasConcern} onChangeText={setAreasConcern} />
+
+      <Text style={styles.section}>Recommendations</Text>
+      <TextInput style={styles.textArea} multiline value={recommendations} onChangeText={setRecommendations} />
+
+      {lastSaved && (
+        <Text style={{ marginTop: 8, color: '#475569', fontSize: 12 }}>
+          Draft auto-saved at {lastSaved}
+        </Text>
+      )}
+
+      <Pressable style={styles.submitButton} onPress={submitMonitoring}>
+        <Text style={styles.submitText}>Submit Examination Monitoring</Text>
+      </Pressable>
+    </ScrollView>
+  );
 }
 /* ---------------- GROUP SUPPORT SCREEN ---------------- */
 
@@ -313,6 +640,66 @@ function GroupSupportScreen() {
   const [schoolSearch, setSchoolSearch] = React.useState('');
   const [showSchoolList, setShowSchoolList] = React.useState(false);
   const [selectedSchools, setSelectedSchools] = React.useState<string[]>([]);
+
+  // --- DRAFT AUTOSAVE ---
+  const GROUP_DRAFT_KEY = 'GROUP_SUPPORT_DRAFT';
+  const [lastSaved, setLastSaved] = React.useState<string | null>(null);
+
+  const saveDraft = async () => {
+    const draft = {
+      selectedSchools,
+      staffMember,
+      date,
+      subject,
+      meetingType,
+      otherMeetingType,
+      focus,
+      expectedAttendees,
+      actualAttendees,
+      generalComments,
+      schoolsOfConcern
+    };
+    await AsyncStorage.setItem(GROUP_DRAFT_KEY, JSON.stringify(draft));
+    setLastSaved(new Date().toLocaleTimeString());
+  };
+
+  const loadDraft = async () => {
+    const saved = await AsyncStorage.getItem(GROUP_DRAFT_KEY);
+    if (saved) {
+      const d = JSON.parse(saved);
+      setSelectedSchools(d.selectedSchools || []);
+      setStaffMember(d.staffMember || '');
+      setDate(d.date || '');
+      setSubject(d.subject || '');
+      setMeetingType(d.meetingType || '');
+      setOtherMeetingType(d.otherMeetingType || '');
+      setFocus(d.focus || '');
+      setExpectedAttendees(d.expectedAttendees || '');
+      setActualAttendees(d.actualAttendees || '');
+      setGeneralComments(d.generalComments || '');
+      setSchoolsOfConcern(d.schoolsOfConcern || '');
+    }
+  };
+
+  React.useEffect(() => {
+    loadDraft();
+  }, []);
+
+  React.useEffect(() => {
+    saveDraft();
+  }, [
+    selectedSchools,
+    staffMember,
+    date,
+    subject,
+    meetingType,
+    otherMeetingType,
+    focus,
+    expectedAttendees,
+    actualAttendees,
+    generalComments,
+    schoolsOfConcern
+  ]);
 
   const filteredSchools =
     schoolSearch.trim().length === 0
@@ -552,6 +939,12 @@ function GroupSupportScreen() {
         value={schoolsOfConcern}
         onChangeText={setSchoolsOfConcern}
       />
+
+      {lastSaved && (
+        <Text style={{ marginTop: 8, color: '#475569', fontSize: 12 }}>
+          Draft auto-saved at {lastSaved}
+        </Text>
+      )}
 
       <Pressable style={styles.submitButton} onPress={submitGroupSupport}>
         <Text style={styles.submitText}>Submit Group Support</Text>
@@ -1927,6 +2320,63 @@ function DirectLearnerSupportScreen() {
   const [materialProvided, setMaterialProvided] = React.useState('');
   const [learnersBenefitted, setLearnersBenefitted] = React.useState('');
 
+  // --- DRAFT AUTOSAVE ---
+  const SUPPORT_DRAFT_KEY = 'DIRECT_SUPPORT_DRAFT';
+  const [lastSaved, setLastSaved] = React.useState<string | null>(null);
+
+  const saveDraft = async () => {
+    const draft = {
+      startDate,
+      endDate,
+      staffMember,
+      subject,
+      selectedSchools,
+      supportTypes,
+      otherSupport,
+      contentOfSupport,
+      materialProvided,
+      learnersBenefitted
+    };
+    await AsyncStorage.setItem(SUPPORT_DRAFT_KEY, JSON.stringify(draft));
+    setLastSaved(new Date().toLocaleTimeString());
+  };
+
+  const loadDraft = async () => {
+    const saved = await AsyncStorage.getItem(SUPPORT_DRAFT_KEY);
+    if (saved) {
+      const d = JSON.parse(saved);
+      setStartDate(d.startDate || '');
+      setEndDate(d.endDate || '');
+      setStaffMember(d.staffMember || '');
+      setSubject(d.subject || '');
+      setSelectedSchools(d.selectedSchools || []);
+      setSupportTypes(d.supportTypes || []);
+      setOtherSupport(d.otherSupport || '');
+      setContentOfSupport(d.contentOfSupport || '');
+      setMaterialProvided(d.materialProvided || '');
+      setLearnersBenefitted(d.learnersBenefitted || '');
+    }
+  };
+
+  React.useEffect(() => {
+    loadDraft();
+  }, []);
+
+  React.useEffect(() => {
+    saveDraft();
+  }, [
+    startDate,
+    endDate,
+    staffMember,
+    subject,
+    selectedSchools,
+    supportTypes,
+    otherSupport,
+    contentOfSupport,
+    materialProvided,
+    learnersBenefitted
+  ]);
+
   const subjects = SUBJECT_LIST;
 
   const filteredSubjects = subjects.filter((s) =>
@@ -2189,6 +2639,12 @@ function DirectLearnerSupportScreen() {
         onChangeText={setLearnersBenefitted}
       />
 
+      {lastSaved && (
+        <Text style={{ marginTop: 8, color: '#475569', fontSize: 12 }}>
+          Draft auto-saved at {lastSaved}
+        </Text>
+      )}
+
       <Pressable
         style={styles.submitButton}
         onPress={submitSupport}
@@ -2236,6 +2692,11 @@ export default function App() {
           name="GroupSupport"
           component={GroupSupportScreen}
           options={{ title: 'Group Support' }}
+        />
+        <Stack.Screen
+          name="ExaminationMonitoring"
+          component={ExaminationMonitoringScreen}
+          options={{ title: 'Examination Monitoring' }}
         />
         <Stack.Screen
           name="Drafts"

@@ -2960,10 +2960,10 @@ const styles = StyleSheet.create({
   },
 
   subLabel: {
-    fontWeight: '600',
-    marginBottom: 6,
-    fontSize: 14,
-    color: '#334155',
+    fontWeight: '700',
+    marginBottom: 8,
+    fontSize: 17,
+    color: '#fff', // white for exam monitoring sub-headings
   },
 
   /* ---------- INPUTS ---------- */

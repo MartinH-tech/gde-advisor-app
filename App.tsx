@@ -236,11 +236,24 @@ function HomeScreen({ navigation }: any) {
   return (
     <View style={{ flex: 1, backgroundColor: '#0b3d6d' }}>
       <ScrollView contentContainerStyle={[styles.homeContainer, { flexGrow: 1, minHeight: '100%' }]} style={{ flex: 1 }}>
+
         <View style={styles.headerBar} />
         <Text style={styles.title}>Gauteng Department of Education</Text>
         <Text style={styles.bigSubtitle}>Subject Advisor Reporting Tools</Text>
         <View style={styles.thickYellowLine} />
 
+        {/* School Visit Report at the top */}
+        <Pressable
+          style={[styles.card, { backgroundColor: '#e0e7ef', borderColor: '#0b3d6d' }]}
+          onPress={() => navigation.navigate('SchoolVisit')}
+        >
+          <Text style={styles.cardTitle}>School Visit Report</Text>
+          <Text style={styles.cardText}>
+            Standard subject advisor school visit reporting tool
+          </Text>
+        </Pressable>
+
+        {/* Existing cards below */}
         <Pressable
           style={[styles.card, styles.priority]}
           onPress={() => navigation.navigate('PriorityVisit')}
@@ -455,9 +468,9 @@ function ExaminationMonitoringScreen() {
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
       <View style={styles.headerBar} />
-      <Text style={styles.screenTitle}>Examination Monitoring (Full Instrument)</Text>
+      <Text style={[styles.screenTitle, { color: '#fff' }]}>Examination Monitoring (Full Instrument)</Text>
 
-      <Text style={styles.section}>A. Examination Centre & Monitor Details</Text>
+      <Text style={[styles.section, { color: '#fff' }]}>A. Examination Centre & Monitor Details</Text>
 
       <TextInput style={styles.input} placeholder="Centre Name" value={centreName} onChangeText={setCentreName} />
       <TextInput style={styles.input} placeholder="District" value={district} onChangeText={setDistrict} />
@@ -542,7 +555,7 @@ function ExaminationMonitoringScreen() {
         { title: "End of Examination", items: endExamSection }
       ].map((section) => (
         <View key={section.title}>
-          <Text style={styles.section}>{section.title}</Text>
+          <Text style={[styles.section, { color: '#fff' }]}>{section.title}</Text>
           {section.items.map((item) => (
             <View key={item}>
               <Text>{item}</Text>
@@ -563,7 +576,7 @@ function ExaminationMonitoringScreen() {
         </View>
       ))}
 
-      <Text style={styles.section}>Areas that Need Development</Text>
+      <Text style={[styles.section, { color: '#fff' }]}>Areas that Need Development</Text>
       <TextInput style={styles.textArea} multiline value={developmentAreas} onChangeText={setDevelopmentAreas} />
 
       <Text style={styles.section}>Recommendations</Text>
@@ -1668,7 +1681,7 @@ Advisor: ${advisor.name}
         onChangeText={setChallenges}
       />
 
-      <Text style={styles.section}>Recommendations</Text>
+      <Text style={[styles.section, { color: '#fff' }]}>Recommendations</Text>
       <TextInput
         style={styles.textArea}
         multiline

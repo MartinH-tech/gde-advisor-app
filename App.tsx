@@ -2006,47 +2006,47 @@ function PriorityVisitScreen() {
   const generatePreview = () => {
     const date = new Date().toISOString().split('T')[0];
 
-    const content = `
-GAUTENG DEPARTMENT OF EDUCATION
-PRIORITY SCHOOL VISIT REPORT
-
-School: ${school}
-Date: ${date}
-Priority Status: ${priority}
-
-GENERAL OBSERVATIONS
-${generalObservations.join('\n')}
-
-CURRICULUM IMPLEMENTATION
-${curriculumItems.join('\n')}
-
-ASSESSMENT PRACTICES
-${assessmentItems.join('\n')}
-
-INTERVENTION STRATEGIES
-${interventionItems.join('\n')}
-
-FINDINGS
-${findings}
-
-CHALLENGES IDENTIFIED
-${challengesIdentified}
-
-RECOMMENDATIONS
-${recommendations}
-
-GOOD PRACTICES
-${goodPractices}
-
-AREAS FOR IMPROVEMENT
-${areasForImprovement}
-
-IMPROVEMENTS FROM PREVIOUS VISITS
-${improvementsFromPrevious}
-
-CHALLENGES EXPERIENCED BY THE SCHOOL
-${schoolChallenges}
-    `;
+    const content = [
+      'GAUTENG DEPARTMENT OF EDUCATION',
+      'PRIORITY SCHOOL VISIT REPORT',
+      '',
+      `School: ${school}`,
+      `Date: ${date}`,
+      `Priority Status: ${priority}`,
+      '',
+      'GENERAL OBSERVATIONS',
+      generalObservations.join('\n'),
+      '',
+      'CURRICULUM IMPLEMENTATION',
+      curriculumItems.join('\n'),
+      '',
+      'ASSESSMENT PRACTICES',
+      assessmentItems.join('\n'),
+      '',
+      'INTERVENTION STRATEGIES',
+      interventionItems.join('\n'),
+      '',
+      'FINDINGS',
+      findings,
+      '',
+      'CHALLENGES IDENTIFIED',
+      challengesIdentified,
+      '',
+      'RECOMMENDATIONS',
+      recommendations,
+      '',
+      'GOOD PRACTICES',
+      goodPractices,
+      '',
+      'AREAS FOR IMPROVEMENT',
+      areasForImprovement,
+      '',
+      'IMPROVEMENTS FROM PREVIOUS VISITS',
+      improvementsFromPrevious,
+      '',
+      'CHALLENGES EXPERIENCED BY THE SCHOOL',
+      schoolChallenges
+    ].join('\n');
 
     setPreviewContent(content);
     setPreviewVisible(true);

@@ -1,3 +1,10 @@
+export const SUBJECT_LIST = [
+  'Mathematics',
+  'Mathematical Literacy',
+  'Physical Sciences',
+  'Xitsonga',
+  'Dramatic Arts',
+];
 // All static lists used in the app
 
 export const SCHOOL_LIST = [

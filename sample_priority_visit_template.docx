@@ -1,0 +1,54 @@
+This is a sample Word template for Power Automate population.
+
+GAUTENG DEPARTMENT OF EDUCATION
+PRIORITY SCHOOL VISIT REPORT
+
+School: [School]
+Date: [Date]
+Priority Status: [PriorityStatus]
+
+GENERAL OBSERVATIONS:
+[GeneralObservations]
+
+CURRICULUM IMPLEMENTATION:
+[CurriculumItems]
+
+ASSESSMENT PRACTICES:
+[AssessmentItems]
+
+INTERVENTION STRATEGIES:
+[InterventionItems]
+
+FINDINGS:
+[Findings]
+
+CHALLENGES IDENTIFIED:
+[ChallengesIdentified]
+
+RECOMMENDATIONS:
+[Recommendations]
+
+GOOD PRACTICES:
+[GoodPractices]
+
+AREAS FOR IMPROVEMENT:
+[AreasForImprovement]
+
+IMPROVEMENTS FROM PREVIOUS VISITS:
+[ImprovementsFromPrevious]
+
+CHALLENGES EXPERIENCED BY THE SCHOOL:
+[SchoolChallenges]
+
+School Stamp:
+[SchoolStampImage]
+
+Principal Signature:
+[PrincipalSignatureImage]
+
+SES Signature:
+[SES_SignatureImage]
+
+---
+
+To use: Replace each [Field] with a Word content control (plain text or picture) and upload to OneDrive/SharePoint for Power Automate population.

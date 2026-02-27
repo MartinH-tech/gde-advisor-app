@@ -5,7 +5,9 @@ import * as FileSystem from 'expo-file-system/legacy';
 import * as MailComposer from 'expo-mail-composer';
 import * as Print from 'expo-print';
 import * as React from 'react';
-import { Alert, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+
+import { Alert, Image, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import SignatureScreen from 'react-native-signature-canvas';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -37,44 +39,7 @@ const SCHOOL_LIST = [
   'ELMAR COLLEGE',
   'EMPRO ACADEMY',
   'FLAVIUS MAREKA SECONDARY SCHOOL',
-  'FOUNDERS COMMUNITY SCHOOL',
-  'GATANG SECONDARY SCHOOL',
-  'GAUTENG CENTRAL COLLEGE',
-  'GLENMARK CHRISTIAN COLLEGE',
-  'GREENWOOD COLLEGE',
-  'HIMALAYA SECONDARY SCHOOL',
-  'HOËRSKOOL CENTURION',
-  'HOËRSKOOL DIE WILGERS',
-  'HOËRSKOOL ELDORAIGNE',
-  'HOËRSKOOL F H ODENDAAL',
-  'HOËRSKOOL GARSFONTEIN',
-  'HOËRSKOOL MENLOPARK',
-  'HOËRSKOOL SILVERTON',
-  'HOËRSKOOL UITSIG',
-  'HOËRSKOOL VOORTREKKERHOOGTE',
-  'HOËRSKOOL WATERKLOOF',
-  'HOËRSKOOL ZWARTKOP',
-  'HOFMEYR SECONDARY SCHOOL',
-  'HOLY TRINITY HIGH SCHOOL (CATHOLIC SEC.)',
-  'J KEKANA SECONDARY SCHOOL',
-  'JAFTA MAHLANGU SECONDARY SCHOOL',
-  'LAKEWOOD COLLEGE',
-  'LAUDIUM SECONDARY SCHOOL',
-  'LEHLABILE SECONDARY SCHOOL',
-  'LIMELIGHT ACADEMY',
-  'LOMPEC INDEPENDENT SECONDARY SCHOOL',
-  'LORETO CONVENT SCHOOL',
-  'LYTTELTON MANOR HIGH SCHOOL',
-  'MAHUBE VALLEY SECONDARY SCHOOL',
-  'MAMELODI SECONDARY SCHOOL',
-  'MBOWENI SECONDARY SCHOOL',
-  'MODIRI TECHNICAL SCHOOL',
-  'NELLMAPIUS SECONDARY SCHOOL',
-  'NUWE HOOPSKOOL',
-  'OLIEVENHOUTBOSCH SECONDARY SCHOOL',
-  'OLIEVENHOUTBOSCH SECONDARY SCHOOL NO 2',
-  'PEPPS MOTHEONG PRIMARY SCHOOL',
-  'PHATENG SECONDARY SCHOOL',
+  const content = `
   'PHELINDABA SECONDARY SCHOOL',
   "PRETORIA BOYS' HIGH SCHOOL",
   'PRETORIA CENTRAL HIGH SCHOOL',
@@ -242,14 +207,14 @@ function HomeScreen({ navigation }: any) {
         <Text style={styles.bigSubtitle}>Subject Advisor Reporting Tools</Text>
         <View style={styles.thickYellowLine} />
 
-        {/* School Visit Report at the top */}
+        {/* FET School Visit Tool at the top */}
         <Pressable
           style={[styles.card, { backgroundColor: '#e0e7ef', borderColor: '#0b3d6d' }]}
           onPress={() => navigation.navigate('SchoolVisit')}
         >
-          <Text style={styles.cardTitle}>School Visit Report</Text>
+          <Text style={styles.cardTitle}>FET School Visit Tool</Text>
           <Text style={styles.cardText}>
-            Standard subject advisor school visit reporting tool
+            Standard subject advisor FET school visit reporting tool
           </Text>
         </Pressable>
 
@@ -1115,6 +1080,7 @@ function DraftsScreen({ navigation }: any) {
 /* ---------------- SCHOOL VISIT SCREEN ---------------- */
 
 function SchoolVisitScreen() {
+    const [sbaStatus, setSbaStatus] = React.useState('');
   const [purpose, setPurpose] = React.useState<string[]>([]);
   const [status, setStatus] = React.useState('');
   const [school, setSchool] = React.useState('');
@@ -1125,10 +1091,11 @@ function SchoolVisitScreen() {
   const [showSubjectList, setShowSubjectList] = React.useState(false);
 
   const [syllabus, setSyllabus] = React.useState({
-    g10: { percent: '', status: '' },
-    g11: { percent: '', status: '' },
-    g12: { percent: '', status: '' },
+    g10: { percent: '' },
+    g11: { percent: '' },
+    g12: { percent: '' },
   });
+  const [scStatus, setScStatus] = React.useState('');
 
   const [sba, setSba] = React.useState({
     g10: '',
@@ -1450,7 +1417,7 @@ Advisor: ${advisor.name}
             <h2>GAUTENG DEPARTMENT OF EDUCATION</h2>
             <div><em>Balancing the Equation</em></div>
             <hr />
-            <h3>SUBJECT ADVISOR SCHOOL VISIT REPORT</h3>
+            <h3>FET SCHOOL VISIT TOOL</h3>
           </div>
 
           <p><strong>School:</strong> ${school}</p>
@@ -1564,7 +1531,7 @@ Advisor: ${advisor.name}
     } else {
       await MailComposer.composeAsync({
         recipients: ["martinharmse@gdets.onmicrosoft.com"],
-        subject: "GDE_TS_SCHOOL_VISIT",
+        subject: "TS_FET_SCHOOL_VISIT",
         body: jsonBody,
         isHtml: false,
       });
@@ -1709,13 +1676,11 @@ Advisor: ${advisor.name}
       </Modal>
 
       <Text style={styles.section}>Syllabus Completion</Text>
-
       {(['g10', 'g11', 'g12'] as const).map((g) => (
         <View key={g} style={styles.box}>
           <Text style={styles.subLabel}>
             Grade {g === 'g10' ? '10' : g === 'g11' ? '11' : '12'}
           </Text>
-
           <TextInput
             style={styles.input}
             placeholder="Percentage completed"
@@ -1725,26 +1690,29 @@ Advisor: ${advisor.name}
               setSyllabus({ ...syllabus, [g]: { ...syllabus[g], percent: t } })
             }
           />
-
-          <TextInput
-            style={styles.input}
-            placeholder="Status (On par / Ahead / Behind)"
-            value={syllabus[g].status}
-            onChangeText={(t) =>
-              setSyllabus({ ...syllabus, [g]: { ...syllabus[g], status: t } })
-            }
-          />
         </View>
       ))}
+      <View style={styles.box}>
+        <Text style={styles.subLabel}>Syllabus Completion Status</Text>
+        <View style={[styles.pickerBox, { marginTop: 8 }]}> 
+          {['red', 'yellow', 'green'].map((option) => (
+            <Pressable
+              key={option}
+              style={[styles.checkbox, scStatus === option && styles.checkboxSelected]}
+              onPress={() => setScStatus(option)}
+            >
+              <Text>{option.charAt(0).toUpperCase() + option.slice(1)}</Text>
+            </Pressable>
+          ))}
+        </View>
+      </View>
 
       <Text style={styles.section}>SBA Completion</Text>
-
       {(['g10', 'g11', 'g12'] as const).map((g) => (
         <View key={g} style={styles.box}>
           <Text style={styles.subLabel}>
             Grade {g === 'g10' ? '10' : g === 'g11' ? '11' : '12'}
           </Text>
-
           <TextInput
             style={styles.input}
             placeholder="SBA completion percentage"
@@ -1754,6 +1722,20 @@ Advisor: ${advisor.name}
           />
         </View>
       ))}
+      <View style={styles.box}>
+        <Text style={styles.subLabel}>SBA Completion Status</Text>
+        <View style={[styles.pickerBox, { marginTop: 8 }]}> 
+          {['red', 'yellow', 'green'].map((option) => (
+            <Pressable
+              key={option}
+              style={[styles.checkbox, sbaStatus === option && styles.checkboxSelected]}
+              onPress={() => setSbaStatus(option)}
+            >
+              <Text>{option.charAt(0).toUpperCase() + option.slice(1)}</Text>
+            </Pressable>
+          ))}
+        </View>
+      </View>
 
       <Text style={styles.section}>Current Status of the School</Text>
       {statuses.map((s) => (
@@ -1840,59 +1822,61 @@ Advisor: ${advisor.name}
 /* ---------------- PRIORITY VISIT SCREEN ---------------- */
 
 function PriorityVisitScreen() {
+      // --- School Stamp State ---
+      const [schoolStampUri, setSchoolStampUri] = React.useState<string | null>(null);
+      const [showStampModal, setShowStampModal] = React.useState(false);
+
+      // Image picker logic (Expo)
+      const pickStampImage = async () => {
+        let result;
+        if (Platform.OS === 'web') {
+          result = await window.showOpenFilePicker({
+            types: [{ description: 'Image', accept: { 'image/*': ['.png', '.jpg', '.jpeg'] } }],
+            multiple: false,
+          });
+          if (result && result.length > 0) {
+            const file = result[0];
+            const fileData = await file.getFile();
+            setSchoolStampUri(URL.createObjectURL(fileData));
+          }
+        } else {
+          const picker = await import('expo-image-picker');
+          const res = await picker.launchImageLibraryAsync({ mediaTypes: picker.MediaTypeOptions.Images, quality: 0.7 });
+          if (!res.cancelled) setSchoolStampUri(res.uri);
+        }
+        setShowStampModal(false);
+      };
+    // --- Signature State ---
+    const [principalSignature, setPrincipalSignature] = React.useState<string | null>(null);
+    const [sesSignature, setSesSignature] = React.useState<string | null>(null);
+    const [showPrincipalSigPad, setShowPrincipalSigPad] = React.useState(false);
+    const [showSesSigPad, setShowSesSigPad] = React.useState(false);
   const [school, setSchool] = React.useState('');
   const [schoolSearch, setSchoolSearch] = React.useState('');
   const [showSchoolList, setShowSchoolList] = React.useState(false);
   // const [reason, setReason] = React.useState(''); // REMOVE OLD STATE
   const [findings, setFindings] = React.useState('');
-  // NEW STRUCTURED STATE
-  const [challengesIdentified, setChallengesIdentified] = React.useState('');
-  const [recommendations, setRecommendations] = React.useState('');
-  const [goodPractices, setGoodPractices] = React.useState('');
-  const [areasForImprovement, setAreasForImprovement] = React.useState('');
-  const [improvementsFromPrevious, setImprovementsFromPrevious] = React.useState('');
-  const [schoolChallenges, setSchoolChallenges] = React.useState('');
-  const [priority, setPriority] = React.useState('');
-
-  const [previewVisible, setPreviewVisible] = React.useState(false);
-  const [previewContent, setPreviewContent] = React.useState('');
-  const [lastSaved, setLastSaved] = React.useState<string | null>(null);
-
-  const PRIORITY_DRAFT_KEY = 'PRIORITY_VISIT_DRAFT';
-
-  /* ---------------- CHECKLIST SECTIONS ---------------- */
-
-  // General Observations
-  const [generalObservations, setGeneralObservations] = React.useState<string[]>([]);
-  const generalObservationList = [
-    'All teachers and learners are present and engaged in scheduled teaching and learning activities.',
-    'The school environment is clean and neat.',
-    'A system is in place to ensure learners of absent teachers are supervised or taught.',
-    'SSIP attendance is monitored and followed up by the SMT, particularly for Grade 12 learners.',
-    'Time-on-task is evident in classrooms observed.',
-  ];
-  const toggleGeneralObservation = (item: string) => {
-    setGeneralObservations((prev) =>
-      prev.includes(item)
-        ? prev.filter((i) => i !== item)
-        : [...prev, item]
-    );
-  };
-
-  // Curriculum Implementation
-  const [curriculumItems, setCurriculumItems] = React.useState<string[]>([]);
-  const curriculumList = [
-    'Learner attendance in Grades 8–11 is regular and monitored.',
-    'The school has submitted the Curriculum Coverage Report to the district in accordance with DM 188 requirements, including a signed scanned copy and the required electronic submission to the District CES.',
-  ];
-  const toggleCurriculumItem = (item: string) => {
-    setCurriculumItems((prev) =>
-      prev.includes(item)
-        ? prev.filter((i) => i !== item)
-        : [...prev, item]
-    );
-  };
-
+  const generatePreview = async () => {
+    const date = new Date().toISOString().split('T')[0];
+    let stampImgTag = '';
+    if (schoolStampUri) {
+      let base64 = '';
+      if (Platform.OS === 'web') {
+        // Web: fetch as blob then convert
+        const res = await fetch(schoolStampUri);
+        const blob = await res.blob();
+        base64 = await new Promise(resolve => {
+          const reader = new window.FileReader();
+          reader.onloadend = () => resolve(reader.result?.toString().split(',')[1] || '');
+          reader.readAsDataURL(blob);
+        });
+      } else {
+        // Native: use FileSystem
+        base64 = await FileSystem.readAsStringAsync(schoolStampUri, { encoding: FileSystem.EncodingType.Base64 });
+      }
+      stampImgTag = `\nSchool Stamp:\n<img src="data:image/png;base64,${base64}" style="width:120px;height:120px;" />`;
+    }
+    const content = `
   // Assessment Practices
   const [assessmentItems, setAssessmentItems] = React.useState<string[]>([]);
   const assessmentList = [
@@ -1933,6 +1917,9 @@ function PriorityVisitScreen() {
     const draft = {
       school,
       priority,
+    setPreviewContent(content);
+    setPreviewVisible(true);
+  };
       generalObservations,
       curriculumItems,
       assessmentItems,
@@ -2076,6 +2063,30 @@ ${schoolChallenges}
   };
 
   const submitPriorityReport = async () => {
+    // --- Convert images to base64 ---
+    let schoolStampBase64 = '';
+    if (schoolStampUri) {
+      if (Platform.OS === 'web') {
+        const res = await fetch(schoolStampUri);
+        const blob = await res.blob();
+        schoolStampBase64 = await new Promise(resolve => {
+          const reader = new window.FileReader();
+          reader.onloadend = () => resolve(reader.result?.toString().split(',')[1] || '');
+          reader.readAsDataURL(blob);
+        });
+      } else {
+        schoolStampBase64 = await FileSystem.readAsStringAsync(schoolStampUri, { encoding: FileSystem.EncodingType.Base64 });
+      }
+    }
+    let principalSignatureBase64 = '';
+    if (principalSignature) {
+      principalSignatureBase64 = principalSignature.replace(/^data:image\/png;base64,/, '');
+    }
+    let sesSignatureBase64 = '';
+    if (sesSignature) {
+      sesSignatureBase64 = sesSignature.replace(/^data:image\/png;base64,/, '');
+    }
+
     const payload = {
       tool: "priority",
       date: new Date().toISOString().split("T")[0],
@@ -2096,6 +2107,11 @@ ${schoolChallenges}
       areasForImprovement,
       improvementsFromPrevious,
       schoolChallenges,
+
+      // Images as base64
+      schoolStampBase64,
+      principalSignatureBase64,
+      sesSignatureBase64,
     };
 
     const isAvailable = await MailComposer.isAvailableAsync();
@@ -2322,6 +2338,91 @@ ${schoolChallenges}
         value={schoolChallenges}
         onChangeText={setSchoolChallenges}
       />
+
+      {/* --- School Stamp Upload --- */}
+      <Text style={styles.section}>School Stamp</Text>
+      {schoolStampUri ? (
+        <View style={{ alignItems: 'center', marginBottom: 12 }}>
+          <Image source={{ uri: schoolStampUri }} style={{ width: 120, height: 120, borderWidth: 1, borderColor: '#ccc', marginBottom: 8 }} resizeMode="contain" />
+          <Pressable style={[styles.submitButton, { marginTop: 8 }]} onPress={() => setSchoolStampUri(null)}>
+            <Text style={styles.submitText}>Clear Stamp</Text>
+          </Pressable>
+        </View>
+      ) : (
+        <Pressable style={[styles.submitButton, { marginBottom: 12 }]} onPress={() => setShowStampModal(true)}>
+          <Text style={styles.submitText}>Upload School Stamp</Text>
+        </Pressable>
+      )}
+      <Modal visible={showStampModal} animationType="slide" transparent>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#00000055' }}>
+          <View style={{ backgroundColor: '#fff', padding: 24, borderRadius: 12, alignItems: 'center' }}>
+            <Text style={{ fontSize: 18, fontWeight: '700', marginBottom: 16 }}>Upload School Stamp</Text>
+            <Pressable style={[styles.submitButton, { marginBottom: 16 }]} onPress={pickStampImage}>
+              <Text style={styles.submitText}>Pick Image</Text>
+            </Pressable>
+            <Pressable style={[styles.submitButton, { backgroundColor: '#475569' }]} onPress={() => setShowStampModal(false)}>
+              <Text style={styles.submitText}>Cancel</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
+      <Text style={styles.section}>Principal Signature</Text>
+      {principalSignature ? (
+        <View style={{ alignItems: 'center', marginBottom: 12 }}>
+          <Image source={{ uri: principalSignature }} style={{ width: 300, height: 100, borderWidth: 1, borderColor: '#ccc' }} resizeMode="contain" />
+          <Pressable style={[styles.submitButton, { marginTop: 8 }]} onPress={() => setPrincipalSignature(null)}>
+            <Text style={styles.submitText}>Clear Signature</Text>
+          </Pressable>
+        </View>
+      ) : (
+        <Pressable style={[styles.submitButton, { marginBottom: 12 }]} onPress={() => setShowPrincipalSigPad(true)}>
+          <Text style={styles.submitText}>Add Principal Signature</Text>
+        </Pressable>
+      )}
+      <Modal visible={showPrincipalSigPad} animationType="slide">
+        <View style={{ flex: 1, backgroundColor: '#fff' }}>
+          <Text style={{ fontSize: 18, fontWeight: '700', margin: 16 }}>Principal Signature</Text>
+          <SignatureScreen
+            onOK={sig => { setPrincipalSignature(sig); setShowPrincipalSigPad(false); }}
+            onEmpty={() => setShowPrincipalSigPad(false)}
+            descriptionText="Sign above"
+            webStyle=".m-signature-pad--footer {display: none;}"
+            autoClear={true}
+          />
+          <Pressable style={[styles.submitButton, { margin: 16 }]} onPress={() => setShowPrincipalSigPad(false)}>
+            <Text style={styles.submitText}>Cancel</Text>
+          </Pressable>
+        </View>
+      </Modal>
+
+      <Text style={styles.section}>SES Signature</Text>
+      {sesSignature ? (
+        <View style={{ alignItems: 'center', marginBottom: 12 }}>
+          <Image source={{ uri: sesSignature }} style={{ width: 300, height: 100, borderWidth: 1, borderColor: '#ccc' }} resizeMode="contain" />
+          <Pressable style={[styles.submitButton, { marginTop: 8 }]} onPress={() => setSesSignature(null)}>
+            <Text style={styles.submitText}>Clear Signature</Text>
+          </Pressable>
+        </View>
+      ) : (
+        <Pressable style={[styles.submitButton, { marginBottom: 12 }]} onPress={() => setShowSesSigPad(true)}>
+          <Text style={styles.submitText}>Add SES Signature</Text>
+        </Pressable>
+      )}
+      <Modal visible={showSesSigPad} animationType="slide">
+        <View style={{ flex: 1, backgroundColor: '#fff' }}>
+          <Text style={{ fontSize: 18, fontWeight: '700', margin: 16 }}>SES Signature</Text>
+          <SignatureScreen
+            onOK={sig => { setSesSignature(sig); setShowSesSigPad(false); }}
+            onEmpty={() => setShowSesSigPad(false)}
+            descriptionText="Sign above"
+            webStyle=".m-signature-pad--footer {display: none;}"
+            autoClear={true}
+          />
+          <Pressable style={[styles.submitButton, { margin: 16 }]} onPress={() => setShowSesSigPad(false)}>
+            <Text style={styles.submitText}>Cancel</Text>
+          </Pressable>
+        </View>
+      </Modal>
       <Modal visible={previewVisible} animationType="slide">
         <ScrollView style={{ padding: 24 }}>
           <Text style={{ fontSize: 18, fontWeight: '700', marginBottom: 16 }}>
@@ -2819,7 +2920,7 @@ export default function App() {
         <Stack.Screen
           name="SchoolVisit"
           component={SchoolVisitScreen}
-          options={{ title: 'School Visit Report' }}
+          options={{ title: 'FET School Visit Tool' }}
         />
         <Stack.Screen
           name="PriorityVisit"
